@@ -88,5 +88,8 @@ public class Vector extends Point {
         return new Vector(_xyz.scale(scalar));
     }
 
-
+    public boolean equals(Object obj) {
+//        return _xyz.equals((Point)obj.);
+        return ((Point)obj).equals(_xyz);
+    }
 }

@@ -1,16 +1,14 @@
 package primitives;
 
-import geometries.Plane;
-
 import java.util.Objects;
 
 public class Point {
+    //package friendly
     final Double3 _xyz;
 
     @Override
     public String toString() {
-        return "Point{"  + _xyz +
-                '}';
+        return "Point "  + _xyz ;
     }
 
     /**
@@ -24,6 +22,14 @@ public class Point {
         _xyz = new Double3(x,y,z);
 //        this(new Double3(x,y,z));
     }
+    /**
+     * primary constructor for point
+     * @param xyz Double3 value gor x, y, z axis
+     */
+    public Point(Double3 xyz) {
+        _xyz = xyz;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -38,15 +44,7 @@ public class Point {
         return Objects.hash(_xyz);
     }
 
-    /**
-     * primary constructor for point
-     * @param xyz Double3 value gor x, y, z axis
-     */
-    public Point(Double3 xyz) {
-        _xyz = xyz;
-    }
-
-    /**
+       /**
      *
      * @param other
      * @return d = ((x2 = x1) * (x2 = x1) + (y2 - y1) * (y2 - y1)  + (z2 = z1 ) * (z2 = z1 ))
@@ -57,10 +55,9 @@ public class Point {
          double y1 = _xyz._d2;
          double z1 = _xyz._d3;
          double x2 = other._xyz._d1;
-         double y2 = other._xyz._d1;
-         double z2 = other._xyz._d1;
-         return ((x2 = x1) * (x2 = x1) + (y2 - y1) * (y2 - y1)  + (z2 - z1 ) * (z2 - z1 ));
-
+         double y2 = other._xyz._d2;
+         double z2 = other._xyz._d3;
+         return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)  + (z2 - z1 ) * (z2 - z1 ));
     }
 
     /**

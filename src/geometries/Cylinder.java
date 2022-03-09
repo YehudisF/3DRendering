@@ -25,8 +25,13 @@ public class Cylinder extends Tube
                 '}';
     }
 
+    /**
+     * yhr normal at a base is equal to central ray's direction vector or opposite
+     * @param point
+     * @return
+     */
     @Override
     public Vector getNormal(Point point) {
-        return null;
+        return axisRay.getDir().normalize();
     }
 }
