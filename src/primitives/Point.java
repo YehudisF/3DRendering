@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Point {
     //package friendly
-    final Double3 _xyz;
+   protected final Double3 _xyz;
 
     @Override
     public String toString() {
@@ -31,20 +31,7 @@ public class Point {
     }
 
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Point point = (Point) o;
-        return Objects.equals(_xyz, point._xyz);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(_xyz);
-    }
-
-       /**
+    /**
      *
      * @param other
      * @return d = ((x2 = x1) * (x2 = x1) + (y2 - y1) * (y2 - y1)  + (z2 = z1 ) * (z2 = z1 ))
@@ -54,10 +41,25 @@ public class Point {
          double x1 = _xyz._d1;
          double y1 = _xyz._d2;
          double z1 = _xyz._d3;
+
          double x2 = other._xyz._d1;
          double y2 = other._xyz._d2;
          double z2 = other._xyz._d3;
+
          return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)  + (z2 - z1 ) * (z2 - z1 ));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Point point = (Point) o;
+        return _xyz.equals(point._xyz);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_xyz);
     }
 
     /**
@@ -65,6 +67,7 @@ public class Point {
      * @param other
      * @return d=Sqrt(lengthSquare)
      * @link https://www.engineeringtoolbox.com/distance-relationship-between-two-points-d_1854.html
+     *
      */
     public double distance(Point other)
     {

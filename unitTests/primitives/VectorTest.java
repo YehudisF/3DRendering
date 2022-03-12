@@ -111,4 +111,11 @@ class VectorTest {
 //        Vector vector2 = new Vector(0, 0, 0);
 //        assertEquals(v1.scale(0),vector2,"scale doesn't work properly");
     }
+
+    @Test
+    void testTestEquals() {
+        Point pt = new Point(1,1,1);
+        Vector v = new Vector(1,1,1);
+        assertNotEquals(pt, v, "coucou was here!!:)");
+    }
 }

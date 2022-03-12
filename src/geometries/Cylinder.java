@@ -32,6 +32,9 @@ public class Cylinder extends Tube
      */
     @Override
     public Vector getNormal(Point point) {
-        return axisRay.getDir().normalize();
+           if(point.subtract(axisRay.getP0()).dotProduct(axisRay.getDir()) == 0)// if the dotproduct is zero`than the point is on the disk and the vector of the ray is the normal
+               return axisRay.getDir().normalize();
+           return super.getNormal(point);// else the point is on the tube, and we use the getnormal function of the tube.(super)
     }
+
 }

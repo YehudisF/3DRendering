@@ -15,10 +15,10 @@ class CylinderTest {
         // ============ Equivalence Partitions Tests ==============
         // TC01: There is a simple single test here
         Cylinder cy = new Cylinder(
-                new Ray(new Point(0, 0, 0), new Vector(0, 0, 1)),
+                new Ray(new Point(0, 0, 1), new Vector(0, 0, 1)),
                 2,
                 3);
-        assertEquals(new Vector(0,0, 1), cy.getNormal(new Point(0, 0, 1)));
+        assertEquals(new Vector(0,0, 1), cy.getNormal(new Point(0, 0, 4)));
 
     }
 }

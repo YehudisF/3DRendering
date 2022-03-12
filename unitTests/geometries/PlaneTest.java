@@ -15,9 +15,9 @@ class PlaneTest {
     void testGetNormal() {
         // problem is that vector doesn't have an equal function so can't use the operator ==.
         // assertEquals(new Vector(-1,0, 0).normalize(), pl.getNormal());
-
-        boolean flag=pl.getNormal().equals(new Vector(-1,0,0).normalize());
-        //assertTrue((pl.getNormal() == new Vector(-1,0,0).normalize()) ||( pl.getNormal() == new Vector(1,0,0).normalize() ));
+        Vector expected = new Vector(-1,0,0).normalize();
+        Vector expected2 = expected.scale(-1);
+        assertTrue(pl.getNormal().equals(expected) || pl.getNormal().equals(expected2));
 
     }
 
