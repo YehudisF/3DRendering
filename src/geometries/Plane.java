@@ -1,9 +1,14 @@
 package geometries;
 
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
 
+import java.util.List;
 import java.util.Objects;
+
+import static primitives.Util.*;
+
 
 public class Plane implements Geometry {
     final private Point _q0;
@@ -61,5 +66,30 @@ public class Plane implements Geometry {
     @Override
     public Vector getNormal(Point point) {
         return getNormal();
+    }
+
+    @Override
+    public List<Point> findIntersections(Ray ray)
+    {
+        // look at powerpoint 4 how to make the function(Ray Plane intersection))
+         Point P0=ray.getP0();
+         Vector v=ray.getDir();
+         Vector n=_normal;
+
+         // denominator
+        double nv = n.dotProduct(v);
+
+        if (isZero(nv))
+            return null;
+
+        Vector P0_Q= P0.subtract(_q0);
+            double t = alignZero( n.dotProduct(P0_Q)/nv);
+            // if t<0 thn the ray is not in the right direction
+        //if t==0 the ray origin alay on the
+            if(t > 0 ) {
+                Point P = P0.add(v.scale(t));
+                return List.of(P);
+            }
+            return null ;
     }
 }

@@ -32,6 +32,8 @@ public class Cylinder extends Tube
      */
     @Override
     public Vector getNormal(Point point) {
+        //avigayil suggested: we should add  if statemenmt to check if the point IS actually the starting point- cdenter
+
            if(point.subtract(axisRay.getP0()).dotProduct(axisRay.getDir()) == 0)// if the dotproduct is zero`than the point is on the disk and the vector of the ray is the normal
                return axisRay.getDir().normalize();
            return super.getNormal(point);// else the point is on the tube, and we use the getnormal function of the tube.(super)

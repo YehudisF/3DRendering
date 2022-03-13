@@ -18,7 +18,9 @@ class CylinderTest {
                 new Ray(new Point(0, 0, 1), new Vector(0, 0, 1)),
                 2,
                 3);
-        assertEquals(new Vector(0,0, 1), cy.getNormal(new Point(0, 0, 4)));
+        // test for point onfirst disk
+        assertEquals(new Vector(0,0, 1), cy.getNormal(new Point(0, 1, 1)));
 
+        assertEquals(new Vector(0,0, 1), cy.getNormal(new Point(0, 1, 4)));
     }
 }
