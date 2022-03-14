@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Geometries implements Intersectable{
-    List<Intersectable>_intersectablesList;
+   protected List<Intersectable>_intersectablesList;
 
     public Geometries() {
         _intersectablesList = new LinkedList<>();
@@ -45,7 +45,8 @@ public class Geometries implements Intersectable{
                 }
                 result.addAll(itemList);
             }
-            result.addAll(item.findIntersections(ray));
+//            if(result != null)
+//                result.addAll(item.findIntersections(ray));
 
         }
             return result;

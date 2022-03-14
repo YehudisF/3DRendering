@@ -39,4 +39,8 @@ class TubeTest {
                 2);
         assertEquals(new Vector(1,1, 0).normalize(), tu.getNormal(new Point(0, 2, 1)));
     }
+
+    @Test
+    void testFindIntersections() {
+    }
 }
