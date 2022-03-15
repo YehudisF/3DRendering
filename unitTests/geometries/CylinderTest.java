@@ -18,10 +18,22 @@ class CylinderTest {
                 new Ray(new Point(0, 0, 1), new Vector(0, 0, 1)),
                 2,
                 3);
-        // test for point onfirst disk
+        // test for point on first disk
         assertEquals(new Vector(0,0, 1), cy.getNormal(new Point(0, 1, 1)));
 
+        // test for point on second disk
         assertEquals(new Vector(0,0, 1), cy.getNormal(new Point(0, 1, 4)));
+
+
+        //test for point on body
+        assertEquals(new Vector(0,1, 0), cy.getNormal(new Point(0, 2, 2)));
+
+        // ============ Boundary Value Tests ==============
+        // test for center point on second disk
+        assertEquals(new Vector(0,0, 1), cy.getNormal(new Point(0, 0, 1)));
+
+        // test for center point on second disk
+        assertEquals(new Vector(0,0, 1), cy.getNormal(new Point(0, 0, 4)));
     }
 
     @Test

@@ -3,6 +3,7 @@ package geometries;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import static primitives.Util.*;
 
 import java.util.List;
 
@@ -46,10 +47,14 @@ public class Cylinder extends Tube
     public Vector getNormal(Point point)
     {
         //avigayil suggested: we should add  if statemenmt to check if the point IS actually the starting point- cdenter
-
-           if(point.subtract(axisRay.getP0()).dotProduct(axisRay.getDir()) == 0)// if the dotproduct is zero`than the point is on the disk and the vector of the ray is the normal
-               return axisRay.getDir().normalize();
-           return super.getNormal(point);// else the point is on the tube, and we use the getnormal function of the tube.(super)
+            Point bottomPoint = axisRay.getPoint(height); // returns the center point of the second disk
+        if(point.equals(bottomPoint) ||point.equals(axisRay.getP0()) )
+            return axisRay.getDir().normalize();
+        if (point.subtract(bottomPoint).length() < radius)// meaning it is on the surface of second disk
+            return axisRay.getDir().normalize();
+        if (point.subtract(axisRay.getP0()).length() < radius)// meaning it is on the surface of first disk
+            return axisRay.getDir().normalize();
+        return super.getNormal(point);// else the point is on the tube, and we use the getnormal function of the tube.(super)
     }
 
 }

@@ -41,7 +41,7 @@ public class Ray {
         if (isZero(delta)){
             return  p0;
         }
-        return p0.add(dir.scale(delta));
+        return p0.add(dir.normalize().scale(delta));
     }
 
     public Ray(Point p0, Vector dir) {

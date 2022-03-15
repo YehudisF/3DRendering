@@ -87,6 +87,9 @@ public class Vector extends Point {
     {
         return new Vector(_xyz.scale(scalar));
     }
-
+    public boolean isZeroVector()
+    {
+        return _xyz.equals(Double3.ZERO);
+    }
 
 }
