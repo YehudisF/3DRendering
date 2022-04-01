@@ -9,6 +9,22 @@ import static primitives.Util.isZero;
  */
 public class Camera {
 
+    public void setP0(Point p0) {
+        this.p0 = p0;
+    }
+
+    public void setvUp(Vector vUp) {
+        this.vUp = vUp;
+    }
+
+    public void setvTo(Vector vTo) {
+        this.vTo = vTo;
+    }
+
+    public void setvRight(Vector vRight) {
+        this.vRight = vRight;
+    }
+
     private  Point p0;          // camera eye
     private  Vector vUp;        // vector pointing upwards : Y axis
     private  Vector vTo;        // vector pointing towards the scene
@@ -66,10 +82,10 @@ public class Camera {
     /**
      * Constructing a ray through a pixel
      *
-     * @param Nx
-     * @param Ny
-     * @param j
-     * @param i
+     * @param Nx number of pixels widthwise
+     * @param Ny number of pixels heightwise
+     * @param j Y value of pixel wanted
+     * @param i x value of pixel wanted
      * @return ray form the camera to Pixel[i,j]
      */
     public Ray constructRay(int Nx, int Ny, int j, int i) {
