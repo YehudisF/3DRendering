@@ -4,6 +4,9 @@ import geometries.Geometries;
 import primitives.Color;
 import lighting.*;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * class scene holds all scene elements class is a PDS and therefore there aer no getters and all fields are public
  */
@@ -12,6 +15,18 @@ public class Scene {
     public final Color background;
     public final AmbientLight ambientLight;
     public final Geometries geometries;
+
+    /**
+     * returns the scene according to the builder design pattern
+     * @param light
+     * @return
+     */
+    public Scene setLight(List<LightSource> light) {
+        this.light = light;
+        return this;
+    }
+
+    List<LightSource> light=new LinkedList<>();
 
     private Scene(SceneBuilder builder) {
         name = builder.name;

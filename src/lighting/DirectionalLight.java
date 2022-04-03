@@ -1,6 +1,7 @@
 package lighting;
 
 import primitives.Color;
+import primitives.Point;
 import primitives.Vector;
 
 public class DirectionalLight extends Light{
@@ -23,5 +24,11 @@ public class DirectionalLight extends Light{
     @Override
     public Color getIntensity() {
         return super.getIntensity();
+    }
+
+    public Vector getL(Point p)
+    {
+        return Direction;
+        //TODO
     }
 }
