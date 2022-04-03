@@ -8,7 +8,7 @@ import java.util.List;
 
 import static primitives.Util.*;
 
-public class Sphere implements Geometry{
+public class Sphere extends Geometry {
     final Point _center;
     final double _radius;
 
@@ -37,7 +37,7 @@ public class Sphere implements Geometry{
      * @return list of points
      */
     @Override
-    public List<Point> findIntersections(Ray ray)
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray)
     {
 
         Point P0 = ray.getP0();
@@ -46,7 +46,7 @@ public class Sphere implements Geometry{
         // than we know the intersection point will be scaling the point by the radius
         if (P0.equals(_center))
         {
-            return List.of(_center.add(v.scale(_radius)));
+            return List.of(new GeoPoint(this, _center.add(v.scale(_radius))) );
         }
 
         Vector U = _center.subtract(P0); // The vector from p0 to the center of the sphere
@@ -68,17 +68,17 @@ public class Sphere implements Geometry{
 //            Point P2 = P0.add(v.scale(t2));
             Point P1 =ray.getPoint(t1);
             Point P2 =ray.getPoint(t2);
-            return List.of(P1, P2);
+            return List.of(new GeoPoint(this, P1),new GeoPoint(this, P2));
         }
         if (t1 > 0) {
 //            Point P1 = P0.add(v.scale(t1));
             Point P1 =ray.getPoint(t1);
-            return List.of(P1);
+            return List.of(new GeoPoint(this, P1));
         }
         if (t2 > 0) {
 //            Point P2 = P0.add(v.scale(t2));
             Point P2 =ray.getPoint(t2);
-            return List.of(P2);
+            return List.of(new GeoPoint(this, P2));
         }
         return null;
 

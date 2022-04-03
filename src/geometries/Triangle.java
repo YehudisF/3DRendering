@@ -9,8 +9,7 @@ import java.util.List;
 /**
  *
  */
-public class Triangle extends Polygon implements Geometry
-{
+public class Triangle extends Polygon{
 
 
     /**
@@ -19,15 +18,15 @@ public class Triangle extends Polygon implements Geometry
      * @param p2
      * @param p3
      */
-    Triangle(Point p1, Point p2, Point p3)
+    public Triangle(Point p1, Point p2, Point p3)
     {
         super(p1, p2, p3);
     }
 
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         //
-         List<Point> result = plane.findIntersections(ray);
+         List<GeoPoint> result = plane.findGeoIntersections(ray);
          if(result == null){
              return null;
          }
@@ -51,7 +50,7 @@ public class Triangle extends Polygon implements Geometry
 
         if(s1> 0 && s2 > 0 && s3 > 0 ||  s1 < 0 && s2< 0 && s3 < 0)
             return result;
-        return super.findIntersections(ray);
+        return super.findGeoIntersections(ray);
     }
 
     @Override
