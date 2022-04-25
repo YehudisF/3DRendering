@@ -21,8 +21,5 @@ public class AmbientLight extends Light{
       super(Ia.scale(Ka));
     }
 
-    @Override
-    public Color getIntensity() {
-        return super.getIntensity();
-    }
+
 }

@@ -91,8 +91,10 @@ public class Plane extends Geometry {
         return null ;
     }
 
-//    @Override
-//    public List<GeoPoint> findGeoIntersections(Ray ray) {
+//   @Override
+//   public List<GeoPoint> findGeoIntersections(Ray ray) {
+//       return this.findGeoIntersectionsHelper(ray);
+//   }
 //        // look at powerpoint 4 how to make the function(Ray Plane intersection))
 //        Point P0=ray.getP0();
 //        Vector v=ray.getDir();

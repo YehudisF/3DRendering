@@ -27,11 +27,15 @@ public class Triangle extends Polygon{
     public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         //
          List<GeoPoint> result = plane.findGeoIntersections(ray);
+
          if(result == null){
              return null;
          }
+
+         //checking that the intersection point is bounded by traingle vertices
          Point p0 = ray.getP0();
-        Vector v = ray.getDir();
+         Vector v = ray.getDir();
+
          Point p1 = vertices.get(0);
          Point p2 = vertices.get(1);
          Point p3 = vertices.get(2);
@@ -49,8 +53,9 @@ public class Triangle extends Polygon{
         double s3 = n3.dotProduct(v);
 
         if(s1> 0 && s2 > 0 && s3 > 0 ||  s1 < 0 && s2< 0 && s3 < 0)
-            return result;
-        return super.findGeoIntersections(ray);
+            return List.of(new GeoPoint(this,result.get(0).point));
+
+        return null;
     }
 
     @Override

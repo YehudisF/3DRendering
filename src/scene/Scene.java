@@ -11,28 +11,26 @@ import java.util.List;
  * class scene holds all scene elements class is a PDS and therefore there aer no getters and all fields are public
  */
 public class Scene {
-    public final String name;
-    public final Color background;
-    public final AmbientLight ambientLight;
-    public final Geometries geometries;
+    private final String name;
+    private final Color background;
+    private final AmbientLight ambientLight;
+    private final Geometries geometries;
+    private final List<LightSource> lights;
 
-    /**
-     * returns the scene according to the builder design pattern
-     * @param light
-     * @return
-     */
-    public Scene setLight(List<LightSource> light) {
-        this.light = light;
-        return this;
+    public AmbientLight getAmbientLight() {
+        return ambientLight;
     }
 
-    List<LightSource> light=new LinkedList<>();
+    public List<LightSource> getLights() {
+        return lights;
+    }
 
     private Scene(SceneBuilder builder) {
         name = builder.name;
         background = builder.background;
         ambientLight = builder.ambientLight;
         geometries = builder.geometries;
+        lights =  builder.lights;
     }
 
     public String getName() {
@@ -53,9 +51,15 @@ public class Scene {
 
     public static class SceneBuilder {
         private final String name;
+        public List<LightSource> lights = new LinkedList<>();
         private Color background = Color.BLACK;
         private AmbientLight ambientLight = new AmbientLight();
         private Geometries geometries = new Geometries();
+
+        public SceneBuilder setLights(List<LightSource> lights) {
+            this.lights = lights;
+            return this;
+        }
 
         public SceneBuilder(String name) {
             this.name = name;

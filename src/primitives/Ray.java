@@ -12,6 +12,11 @@ public class Ray {
     final Point p0;
     final Vector dir;
 
+    public Ray(Point p0, Vector dir) {
+        this.p0 = p0;
+        this.dir = dir.normalize();
+    }
+
     @Override
     public String toString() {
         return "Ray{" +
@@ -45,23 +50,22 @@ public class Ray {
         if (isZero(delta)) {
             return p0;
         }
-        return p0.add(dir.normalize().scale(delta));
-    }
-
-    public Ray(Point p0, Vector dir) {
-        this.p0 = p0;
-        this.dir = dir.normalize();
+        return p0.add(dir.scale(delta));
     }
 
     public Point findClosestPoint(List<Point> points) {
         return points == null || points.isEmpty() ? null
-                : findClosestGeoPoint(points.stream().map(p -> new GeoPoint(null, p)).toList()).point;
+                : findClosestGeoPoint(points
+                .stream()
+                .map(p -> new GeoPoint(null, p))
+                .toList())
+                .point;
     }
 
     public GeoPoint findClosestGeoPoint(List<GeoPoint> geoPoints) {
 
         double minDistance = Double.MAX_VALUE;
-        double pointDistance;
+        double pointDistance = 0d;
         GeoPoint closestPoint = null;
         for (GeoPoint geopoint : geoPoints) {
             pointDistance = geopoint.point.distanceSquared(p0);

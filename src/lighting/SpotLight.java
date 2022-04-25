@@ -14,33 +14,24 @@ public class SpotLight extends PointLight {
      */
     public SpotLight(Color intensity, Point position, Vector direction) {
         super(intensity, position);
-        this.direction = direction;
+        this.direction = direction.normalize();
     }
 
     final Vector direction;
 
-    @Override
-    public Color getIntensity() {
-        return super.getIntensity();
-    }
 
-    public Color getIntensity(Point P)
+    public Color getIntensity(Point p)
     {
-        // but kL and Kq are 0
-        double calc=(kC+Position.distance(P))*kL+(Position.distanceSquared(P));
-        Vector l=P.subtract(Position);
-        return (super.getIntensity().scale(Math.max(0,direction.normalize().dotProduct(l))).reduce(calc));
+//        // but kL and Kq are 0
+//        double denominator= intensityHelp(p);
+//        Vector l= getL(p);
+//        return (getIntensity().scale(Math.max(0,direction.normalize().dotProduct(l))).reduce(denominator));
+        Color pointIntensity = super.getIntensity(p);
+        double factor = Math.max(0, direction.dotProduct(getL(p)));
+        return pointIntensity.scale(factor);
     }
 
-    public Vector getL(Point p)
-    {
-        return direction;
-    }
 
-     private SpotLight setDirection(Vector dir){
-        direction = dir;
-        return this;
-    }
 }
 
 

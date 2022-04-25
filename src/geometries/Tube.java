@@ -41,8 +41,13 @@ public class Tube extends Geometry {
      */
     @Override
     public Vector getNormal(Point point) {
-        double t = axisRay.getDir().dotProduct(point.subtract( axisRay.getP0()));//finding scaler for the projection of point on axisRay
-        Point O = axisRay.getP0().add(axisRay.getDir().scale(t));// O is the projection of point on axisRay
+        Vector P0_point = point.subtract(axisRay.getP0());
+        Vector v = axisRay.getDir();
+
+        double t = v.dotProduct(P0_point);  // finding scaler for the projection of point on axisRay
+
+        Point O = axisRay.getPoint(t);   // O is the projection of point on axisRay
+
         Vector N=point.subtract(O);
         return N.normalize();
     }

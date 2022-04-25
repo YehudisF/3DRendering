@@ -36,10 +36,9 @@ public class RenderTests {
 				.setBackground(new Color(75, 127, 90))
 				.build();
 
-		scene.geometries.add(new Sphere( new Point(0, 0, -100),50),
+		scene.getGeometries().add(
+				new Sphere( new Point(0, 0, -100),50),
 				new Triangle(new Point(-100,0,-100),new Point(0,100,-100),new Point(-100,100,-100)),//up left
-
-				new Triangle(new Point(100, 0, -100), new Point(0, 100, -100), new Point(100, 100, -100)), // up right
 																													// left
 				new Triangle(new Point(-100, 0, -100), new Point(0, -100, -100), new Point(-100, -100, -100)), // down
 																														// left
@@ -68,7 +67,7 @@ public class RenderTests {
 				.setAmbientLight(new AmbientLight(new Color(WHITE), new Double3(0.2)))
 				.build(); //
 
-		scene.geometries.add( //
+		scene.getGeometries().add( //
 				new Sphere(new Point(0, 0, -100), 50),
 				// up left
 				new Triangle(new Point(-100, 0, -100), new Point(0, 100, -100), new Point(-100, 100, -100))
@@ -96,8 +95,17 @@ public class RenderTests {
 	 */
 	@Test
 	public void basicRenderXml() {
+
+		xmlToScene xmlRead = new xmlToScene("C:\\Users\\Hudis\\Downloads\\basicRenderTestTwoColors.xml");
 		Scene scene = new Scene.SceneBuilder("XML Test scene")
+				.setAmbientLight(xmlRead.getAmbient())
+				.setBackground(xmlRead.getBG())
+				.setGeometries(xmlRead.getGeometries())
 				.build();
+
+
+
+
 		// enter XML file name and parse from XML file into scene object
 		// ...
 
