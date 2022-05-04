@@ -9,7 +9,7 @@ import java.util.List;
 /**
  *
  */
-public class Triangle extends Polygon{
+public class Triangle extends Polygon implements FlatGeometry{
 
 
     /**
@@ -24,7 +24,7 @@ public class Triangle extends Polygon{
     }
 
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         //
          List<GeoPoint> result = plane.findGeoIntersections(ray);
 
@@ -65,4 +65,6 @@ public class Triangle extends Polygon{
                 ", plane=" + plane +
                 '}';
     }
+
+
 }

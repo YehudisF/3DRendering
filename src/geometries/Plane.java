@@ -10,7 +10,7 @@ import java.util.Objects;
 import static primitives.Util.*;
 
 
-public class Plane extends Geometry {
+public class Plane extends Geometry implements FlatGeometry{
     final private Point _q0;
     final private Vector _normal;
 
@@ -69,7 +69,7 @@ public class Plane extends Geometry {
     }
 
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         Point P0=ray.getP0();
         Vector v=ray.getDir();
         Vector n=_normal;
@@ -81,15 +81,33 @@ public class Plane extends Geometry {
             return null;
 
         Vector P0_Q= _q0.subtract(P0);
-        double t = alignZero( n.dotProduct(P0_Q)/nv);
+        // numberator
+        double np0_q0 = alignZero(n.dotProduct(P0_Q));
+        // if ray is parralel to the line
+        if(isZero(np0_q0)){
+            return null;
+        }
+
+        double t = alignZero(np0_q0/nv );
         // if t<0 thn the ray is not in the right direction
         //if t==0 the ray origin alay on the
-        if(t > 0 ) {
-            Point P = P0.add(v.scale(t));
-            return List.of(new GeoPoint(this,P));// returns a Geopoint
+
+        if(alignZero(t-maxDistance)> 0) {
+           return null;
+      }
+        if(t < 0 ) {
+            return  null;
         }
-        return null ;
+        Point P = P0.add(v.scale(t));
+        return List.of(new GeoPoint(this,P));// returns a Geopoint
+
+//        if(alignZero(t-maxDistance)> 0) {
+//            return null;
+//        }
+
     }
+
+
 
 //   @Override
 //   public List<GeoPoint> findGeoIntersections(Ray ray) {

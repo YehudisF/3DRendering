@@ -32,7 +32,7 @@ public class Geometries extends Intersectable {
 
 
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
         List<GeoPoint> intersections = null;
         for (Intersectable geometry : _intersectablesList) {
             var geoIntersections = geometry.findGeoIntersections(ray);
@@ -45,5 +45,6 @@ public class Geometries extends Intersectable {
         }
         return intersections;
     }
+
 
 }

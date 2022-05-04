@@ -24,8 +24,8 @@ public class Cylinder extends Tube
 
     public List<GeoPoint> findGeoIntersectionHelper(Ray ray)
     {
-        return super.findGeoIntersectionsHelper(ray);
-    }
+        return super.findGeoIntersections(ray);
+    } // changed it from helper to not helper
 
 
     @Override

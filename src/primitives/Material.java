@@ -9,6 +9,8 @@ public class Material
     // all the fieds have a default value of 0, there is a default constructor
     public Double3 kD=new Double3(0);
     public Double3 kS=new Double3(0);
+    public Double3 kT = new Double3(0.0); // transparancy attenuation factor
+    public Double3 kR = new Double3(0.0); // reflection attenuation factor
     public int nShininess=0;
 
     /**
@@ -23,11 +25,68 @@ public class Material
 
     /**
      * setter according to the builder pattern
+     * @param kd
+     * @return
+     */
+    public Material setkD(Double kd) {
+        kD = new Double3(kd);
+        return this;
+    }
+
+    /**
+     * setter according to the builder pattern
+     * @param kt
+     * @return
+     */
+    public Material setkT(Double3 kt) {
+        kT = kt;
+        return this;
+    }
+    /**
+     * setter according to the builder pattern
+     * @param kt
+     * @return
+     */
+    public Material setkT(Double kt) {
+        kT = new Double3(kt);
+        return this;
+    }
+    /**
+     * setter according to the builder pattern
+     * @param kr
+     * @return
+     */
+    public Material setkR(Double3 kr) {
+        kR = kr;
+        return this;
+    }
+    /**
+     * setter according to the builder pattern
+     * @param kr
+     * @return
+     */
+    public Material setkR(Double kr) {
+        kR = new Double3(kr);
+        return this;
+    }
+
+    /**
+     * setter according to the builder pattern
      * @param kS
      * @return
      */
     public Material setkS(Double3 kS) {
         this.kS = kS;
+        return this;
+    }
+
+    /**
+     * setter according to the builder pattern
+     * @param ks
+     * @return
+     */
+    public Material setkS(Double ks) {
+        kS = new Double3(ks);
         return this;
     }
 

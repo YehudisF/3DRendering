@@ -11,11 +11,21 @@ import static primitives.Util.isZero;
 public class Ray {
     final Point p0;
     final Vector dir;
-
+    private static final double DELTA=0.1;
 
     public Ray(Point p0, Vector dir) {
         this.p0 = p0;
         this.dir = dir.normalize();
+    }
+
+    public Ray(Point point, Vector direction, Vector normal) {
+        //point + normal.scale(±EPSILON)
+        dir = direction.normalize();
+
+        double nv = normal.dotProduct(dir);
+
+        Vector normalDelta = normal.scale((nv > 0 ? DELTA : -DELTA));
+        p0 = point.add(normalDelta);
     }
 
     @Override

@@ -25,7 +25,7 @@ public class Point {
     }
     /**
      * primary constructor for point
-     * @param xyz Double3 value gor x, y, z axis
+     * @param _xyz Double3 value gor x, y, z axis
      */
     public Point(Double3 _xyz) {
         xyz = _xyz;
