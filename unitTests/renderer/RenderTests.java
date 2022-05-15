@@ -93,29 +93,29 @@ public class RenderTests {
 	/**
 	 * Test for XML based scene - for bonus
 	 */
-	@Test
-	public void basicRenderXml() {
-
-		xmlToScene xmlRead = new xmlToScene("C:\\Users\\Hudis\\Downloads\\basicRenderTestTwoColors.xml");
-		Scene scene = new Scene.SceneBuilder("XML Test scene")
-				.setAmbientLight(xmlRead.getAmbient())
-				.setBackground(xmlRead.getBG())
-				.setGeometries(xmlRead.getGeometries())
-				.build();
-
-
-
-
-		// enter XML file name and parse from XML file into scene object
-		// ...
-
-		Camera camera = new Camera(Point.ZERO, new Vector(0, 0, -1), new Vector(0, 1, 0)) //
-				.setVPDistance(100) //
-				.setVPSize(500, 500)
-				.setImageWriter(new ImageWriter("xml render test", 1000, 1000))
-				.setRayTracer(new RayTracerBasic(scene));
-		camera.renderImage();
-		camera.printGrid(100, new Color(java.awt.Color.YELLOW));
-		camera.writeToImage();
-	}
+//	@Test
+//	public void basicRenderXml() {
+//
+//		xmlToScene xmlRead = new xmlToScene("C:\\Users\\Hudis\\Downloads\\basicRenderTestTwoColors.xml");
+//		Scene scene = new Scene.SceneBuilder("XML Test scene")
+//				.setAmbientLight(xmlRead.getAmbient())
+//				.setBackground(xmlRead.getBG())
+//				.setGeometries(xmlRead.getGeometries())
+//				.build();
+//
+//
+//
+//
+//		// enter XML file name and parse from XML file into scene object
+//		// ...
+//
+//		Camera camera = new Camera(Point.ZERO, new Vector(0, 0, -1), new Vector(0, 1, 0)) //
+//				.setVPDistance(100) //
+//				.setVPSize(500, 500)
+//				.setImageWriter(new ImageWriter("xml render test", 1000, 1000))
+//				.setRayTracer(new RayTracerBasic(scene));
+//		camera.renderImage();
+//		camera.printGrid(100, new Color(java.awt.Color.YELLOW));
+//		camera.writeToImage();
+//	}
 }

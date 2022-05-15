@@ -7,10 +7,10 @@ package primitives;
 public class Material
 {
     // all the fieds have a default value of 0, there is a default constructor
-    public Double3 kD=new Double3(0);
-    public Double3 kS=new Double3(0);
-    public Double3 kT = new Double3(0.0); // transparancy attenuation factor
-    public Double3 kR = new Double3(0.0); // reflection attenuation factor
+    public Double3 kD=Double3.ZERO;
+    public Double3 kS= Double3.ZERO;
+    public Double3 kT = Double3.ZERO; // transparancy attenuation factor
+    public Double3 kR = Double3.ZERO; // reflection attenuation factor
     public int nShininess=0;
 
     /**

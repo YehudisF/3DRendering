@@ -6,12 +6,14 @@ import geometries.Intersectable.GeoPoint;
 import java.util.List;
 import java.util.Objects;
 
+import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
 
 public class Ray {
     final Point p0;
     final Vector dir;
-    private static final double DELTA=0.1;
+
+    private static final double DELTA = 0.1;
 
     public Ray(Point p0, Vector dir) {
         this.p0 = p0;
@@ -22,7 +24,7 @@ public class Ray {
         //point + normal.scale(±EPSILON)
         dir = direction.normalize();
 
-        double nv = normal.dotProduct(dir);
+        double nv = alignZero(normal.dotProduct(dir));
 
         Vector normalDelta = normal.scale((nv > 0 ? DELTA : -DELTA));
         p0 = point.add(normalDelta);

@@ -2,9 +2,12 @@ package lighting;
 
 import primitives.Color;
 import primitives.Point;
+import primitives.Util;
 import primitives.Vector;
 
-public class SpotLight extends PointLight {
+import static primitives.Util.*;
+
+public class SpotLight extends PointLight implements LightSource {
 
     /**
      *
@@ -19,6 +22,18 @@ public class SpotLight extends PointLight {
 
     final Vector direction;
 
+    /**
+     * Constructor of Spotlight which receives four params
+     *
+     * @param c light intensity
+     * @param pos     Light starts location
+     * @param direction       direction of the light
+     * @param radius
+     */
+    public SpotLight(Color intensity, Point position, Vector direction, double radius) {
+        super(intensity, position, radius);
+        this.direction = direction.normalize();
+    }
 
     public Color getIntensity(Point p)
     {
@@ -26,8 +41,15 @@ public class SpotLight extends PointLight {
 //        double denominator= intensityHelp(p);
 //        Vector l= getL(p);
 //        return (getIntensity().scale(Math.max(0,direction.normalize().dotProduct(l))).reduce(denominator));
+        double projection=direction.dotProduct(getL(p));
+        if(Util.isZero(projection))
+        {
+            return Color.BLACK;
+        }
+        double factor = Math.max(0, projection);
+
         Color pointIntensity = super.getIntensity(p);
-        double factor = Math.max(0, direction.dotProduct(getL(p)));
+
         return pointIntensity.scale(factor);
     }
 
