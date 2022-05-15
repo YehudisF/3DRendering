@@ -17,18 +17,6 @@ public class PointLight extends Light implements LightSource {
         position = _position;
     }
 
-    /**
-     * second constructor for PointLight with three parameters
-     *
-     * @param c the light intensity
-     * @param pos  Light start location
-     * @param radius
-     */
-    public PointLight(Color c, Point pos, double radius) {
-        super(c);
-        position = pos;
-        radius = radius;
-    }
 
     public PointLight setkC(double kC) {
         this.kC = new Double3(kC);
@@ -51,16 +39,21 @@ public class PointLight extends Light implements LightSource {
         return super.getIntensity();
     }
 
-    protected Double3 intensityHelp(Point p) {
-        double ds = p.distanceSquared(position);
-        double d = p.distance(position);
-        return (kC.add(kL.scale(d)).add( kQ.scale(ds)));
-    }
+//    protected Double3 intensityHelp(Point p) {
+//        double ds = p.distanceSquared(position);
+//        double d = p.distance(position);
+//        return (kC.add(kL.scale(d)).add( kQ.scale(ds)));
+//    }
 
     public Color getIntensity(Point p) {
         // but kL and Kq are 0
-        Double3 denominator = intensityHelp(p);
-        return super.getIntensity().reduce(denominator);
+        Color lightIntensity = getIntensity();
+
+        double ds = p.distanceSquared(position);
+        double d = p.distance(position);
+        Double3 denominator = kC.add(kL.scale(d)).add( kQ.scale(ds));
+
+        return lightIntensity.reduce(denominator);
     }
 
     @Override

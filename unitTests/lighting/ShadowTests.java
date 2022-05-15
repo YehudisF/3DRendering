@@ -1,9 +1,8 @@
 package lighting;
 
-import org.junit.jupiter.api.Test;
-
 import static java.awt.Color.*;
 
+import org.junit.jupiter.api.Test;
 import renderer.ImageWriter;
 import lighting.*;
 import geometries.*;
@@ -13,16 +12,16 @@ import scene.Scene;
 
 /**
  * Testing basic shadows
- * 
+ *
  * @author Dan
  */
 public class ShadowTests {
 	private Intersectable sphere = new Sphere(new Point(0, 0, -200), 60d) //
 			.setEmission(new Color(BLUE)) //
-			.setMaterial(new Material().setkD(0.5).setkS(0.5).setnShininess(30));
-	private Material trMaterial = new Material().setkD(0.5).setkS(0.5).setnShininess(30);
+			.setMaterial(new Material().setKd(0.5).setKs(0.5).setnShininess(30));
+	private Material trMaterial = new Material().setKd(0.5).setKs(0.5).setnShininess(30);
 
-	private Scene scene = new Scene.SceneBuilder("Test scene").build();
+	private Scene scene =  new Scene.SceneBuilder("Test scene").build();
 	private Camera camera = new Camera(new Point(0, 0, 1000), new Vector(0, 0, -1), new Vector(0, 1, 0)) //
 			.setVPSize(200, 200).setVPDistance(1000) //
 			.setRayTracer(new RayTracerBasic(scene));
@@ -96,16 +95,18 @@ public class ShadowTests {
 	 */
 	@Test
 	public void trianglesSphere() {
-		Scene scene = new Scene.SceneBuilder("Test scene").setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE), new Double3(0.15))).build();
+		 Scene scene =  new Scene.SceneBuilder("Test scene").
+				 setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE), new Double3(0.15))).build();
+
 
 		scene.getGeometries().add( //
 				new Triangle(new Point(-150, -150, -115), new Point(150, -150, -135), new Point(75, 75, -150)) //
-						.setMaterial(new Material().setkS(0.8).setnShininess(60)), //
+						.setMaterial(new Material().setKs(0.8).setnShininess(60)), //
 				new Triangle(new Point(-150, -150, -115), new Point(-70, 70, -140), new Point(75, 75, -150)) //
-						.setMaterial(new Material().setkS(0.8).setnShininess(60)), //
+						.setMaterial(new Material().setKs(0.8).setnShininess(60)), //
 				new Sphere(new Point(0, 0, -11), 30d) //
 						.setEmission(new Color(java.awt.Color.BLUE)) //
-						.setMaterial(new Material().setkD(0.5).setkS(0.5).setnShininess(30)) //
+						.setMaterial(new Material().setKd(0.5).setKs(0.5).setnShininess(30)) //
 		);
 		scene.getLights().add( //
 				new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4)) //

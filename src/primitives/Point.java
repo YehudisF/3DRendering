@@ -5,11 +5,11 @@ import java.util.Objects;
 public class Point {
     //package friendly
     public static final Point ZERO = new Point(0d, 0d, 0d);
-   protected final Double3 xyz;
+    protected final Double3 xyz;
 
     @Override
     public String toString() {
-        return "Point "  + xyz ;
+        return "Point " + xyz;
     }
 
     /**
@@ -20,11 +20,13 @@ public class Point {
      * @param z
      */
     public Point(double x, double y, double z) {
-        xyz = new Double3(x,y,z);
+        xyz = new Double3(x, y, z);
 //        this(new Double3(x,y,z));
     }
+
     /**
      * primary constructor for point
+     *
      * @param _xyz Double3 value gor x, y, z axis
      */
     public Point(Double3 _xyz) {
@@ -33,21 +35,19 @@ public class Point {
 
 
     /**
-     *
      * @param other
      * @return d = ((x2 = x1) * (x2 = x1) + (y2 - y1) * (y2 - y1)  + (z2 = z1 ) * (z2 = z1 ))
      */
-    public double distanceSquared(Point other)
-    {
-         double x1 = xyz.d1;
-         double y1 = xyz.d2;
-         double z1 = xyz.d3;
+    public double distanceSquared(Point other) {
+        double x1 = xyz.d1;
+        double y1 = xyz.d2;
+        double z1 = xyz.d3;
 
-         double x2 = other.xyz.d1;
-         double y2 = other.xyz.d2;
-         double z2 = other.xyz.d3;
+        double x2 = other.xyz.d1;
+        double y2 = other.xyz.d2;
+        double z2 = other.xyz.d3;
 
-         return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)  + (z2 - z1 ) * (z2 - z1 ));
+        return ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
     }
 
     @Override
@@ -64,14 +64,11 @@ public class Point {
     }
 
     /**
-     *
      * @param other
      * @return d=Sqrt(lengthSquare)
      * @link https://www.engineeringtoolbox.com/distance-relationship-between-two-points-d_1854.html
-     *
      */
-    public double distance(Point other)
-    {
+    public double distance(Point other) {
         return Math.sqrt(distanceSquared(other));
     }
 

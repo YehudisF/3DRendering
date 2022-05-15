@@ -10,10 +10,17 @@ import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
 
 public class Ray {
+    private static final double DELTA = 0.1;
+
+    /**
+     * starting point of the ray
+     */
     final Point p0;
+    /**
+     * ray normalized direction vector
+     */
     final Vector dir;
 
-    private static final double DELTA = 0.1;
 
     public Ray(Point p0, Vector dir) {
         this.p0 = p0;
@@ -43,7 +50,7 @@ public class Ray {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Ray ray = (Ray) o;
-        return Objects.equals(p0, ray.p0) && Objects.equals(dir, ray.dir);
+        return p0.equals(ray.p0) && dir.equals(ray.dir);
     }
 
     @Override
@@ -66,18 +73,9 @@ public class Ray {
         return p0.add(dir.scale(delta));
     }
 
-    public Point findClosestPoint(List<Point> points) {
-        return points == null || points.isEmpty() ? null
-                : findClosestGeoPoint(points
-                .stream()
-                .map(p -> new GeoPoint(null, p))
-                .toList())
-                .point;
-    }
-
     public GeoPoint findClosestGeoPoint(List<GeoPoint> geoPoints) {
 
-        double minDistance = Double.MAX_VALUE;
+        double minDistance = Double.POSITIVE_INFINITY;
         double pointDistance = 0d;
         GeoPoint closestPoint = null;
         for (GeoPoint geopoint : geoPoints) {
@@ -88,6 +86,15 @@ public class Ray {
             }
         }
         return closestPoint;
+    }
+
+    public Point findClosestPoint(List<Point> points) {
+        return points == null || points.isEmpty() ? null
+                : findClosestGeoPoint(points
+                .stream()
+                .map(p -> new GeoPoint(null, p))
+                .toList())
+                .point;
     }
 
 
