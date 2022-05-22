@@ -5,6 +5,7 @@ import primitives.Ray;
 import primitives.Vector;
 import static primitives.Util.*;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Cylinder extends Tube
@@ -20,12 +21,58 @@ public class Cylinder extends Tube
         return height;
     }
 
+    @Override
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+        List<GeoPoint> intersections = super.findGeoIntersectionsHelper(ray, maxDistance);
+        if (intersections == null) {
+            return null;
+        }
+        Vector va = this.axisRay.getDir();
+        Point A = this.axisRay.getP0();
+        Point B = this.axisRay.getPoint(height);
+        List<GeoPoint> intersectionsCylinder = new LinkedList<>();
+        double lowerBound, upperBound;
+        for (GeoPoint gPoint : intersections) {
+            lowerBound = va.dotProduct(gPoint.point.subtract(A));
+            upperBound = va.dotProduct(gPoint.point.subtract(B));
+            if (lowerBound > 0 && upperBound > 0) {
+                // the check for distance, if the intersection point is beyond the distance
+                if (alignZero(gPoint.point.distance(ray.getP0()) - maxDistance) <= 0)
+                    intersectionsCylinder.add(gPoint);
+            }
+        }
+        Plane topA = new Plane(A, va);
+        Plane bottomB = new Plane( B, va);
+        List<GeoPoint> intersectionPlaneA = topA.findGeoIntersections(ray, maxDistance);
+        List<GeoPoint> intersectionPlaneB = bottomB.findGeoIntersections(ray, maxDistance);
+        if (intersectionPlaneA == null && intersectionPlaneB == null) {
+            return intersectionsCylinder;
+        }
+        Point q3, q4;
+        if (intersectionPlaneA != null) {
+            q3 = intersectionPlaneA.get(0).point;
+            if (q3.subtract(A).lengthSquared() < radius * radius) {
+                intersectionsCylinder.add(intersectionPlaneA.get(0));
+            }
+        }
+        if (intersectionPlaneB != null) {
+            q4 = intersectionPlaneB.get(0).point;
+            if (q4.subtract(B).lengthSquared() < radius * radius) {
+                intersectionsCylinder.add(intersectionPlaneB.get(0));
+            }
+        }
+        if (intersectionsCylinder.isEmpty()) {
+            return null;
+        }
+        return intersectionsCylinder;
+    }
 
-
-    public List<GeoPoint> findGeoIntersectionHelper(Ray ray)
-    {
-        return super.findGeoIntersections(ray);
-    } // changed it from helper to not helper
+//    public List<GeoPoint> findGeoIntersectionHelper(Ray ray, double maxDistance)
+//    {
+//        //return super.findGeoIntersections(ray);
+//
+//    }
+     // changed it from helper to not helper
 
 
     @Override

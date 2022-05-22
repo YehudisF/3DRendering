@@ -8,7 +8,7 @@ import primitives.Vector;
 public abstract class Geometry extends Intersectable {
 
     protected Color emission = Color.BLACK;
-
+    private Material material=new Material();
     /**
      * setter for material according to builder design pattern
      * @param material
@@ -27,7 +27,7 @@ public abstract class Geometry extends Intersectable {
         return material;
     }
 
-    private Material material=new Material();
+
 
     public Color getEmission() {
         return emission;

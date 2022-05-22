@@ -95,9 +95,7 @@ public class ShadowTests {
 	 */
 	@Test
 	public void trianglesSphere() {
-		 Scene scene =  new Scene.SceneBuilder("Test scene").
-				 setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE), new Double3(0.15))).build();
-
+		scene.setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE), new Double3(0.15)));
 
 		scene.getGeometries().add( //
 				new Triangle(new Point(-150, -150, -115), new Point(150, -150, -135), new Point(75, 75, -150)) //
@@ -113,8 +111,7 @@ public class ShadowTests {
 						.setkL(4E-4).setkQ(2E-5));
 
 		camera.setImageWriter(new ImageWriter("shadowTrianglesSphere", 600, 600)) //
-				.renderImage() //
-				.writeToImage();
+				.renderImage(); //
+		camera.writeToImage();
 	}
-
 }

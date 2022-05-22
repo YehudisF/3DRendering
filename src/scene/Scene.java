@@ -13,7 +13,7 @@ import java.util.List;
 public class Scene {
     private final String name;
     private final Color background;
-    private final AmbientLight ambientLight;
+    private AmbientLight ambientLight;
     private final Geometries geometries;
     private final List<LightSource> lights;
 
@@ -24,6 +24,8 @@ public class Scene {
     public List<LightSource> getLights() {
         return lights;
     }
+
+
 
     private Scene(SceneBuilder builder) {
         name = builder.name;
@@ -43,6 +45,11 @@ public class Scene {
 
     public AmbientLight getAmbienLight() {
         return ambientLight;
+    }
+
+    public Scene setAmbientLight(AmbientLight ambientLight) {
+        this.ambientLight=ambientLight;
+        return this;
     }
 
     public Geometries getGeometries() {
