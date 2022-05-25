@@ -7,6 +7,10 @@ public class Point {
     public static final Point ZERO = new Point(0d, 0d, 0d);
     protected final Double3 xyz;
 
+    public Point(Point p) {
+        xyz = p.xyz;
+    }
+
     @Override
     public String toString() {
         return "Point " + xyz;

@@ -90,50 +90,105 @@ public class Polygon extends Geometry implements FlatGeometry {
 	}
 
 
-
 	@Override
 	protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+		//first, find the intersections for the plane in which the polygon is
+		List<GeoPoint> result = plane.findGeoIntersections(ray, maxDistance);
 
+		if (result == null) { //if the intersections with the plane returned null so return null
+			return null;
+		}
 
-			List<GeoPoint> result = plane.findGeoIntersections(ray);
-			if (result == null) {
-				return result;
-			}
+		Point P0 = ray.getP0();
+		Vector v = ray.getDir();
 
-			Point P0 = ray.getP0();
-			Vector v = ray.getDir();
+		//get the first and second vertices
+		Point P1 = vertices.get(1);
+		Point P2 = vertices.get(0);
 
-			Point P1 = vertices.get(1);
-			Point P2 = vertices.get(0);
+		Vector v1 = P1.subtract(P0); //v1=p1-p0
+		Vector v2 = P2.subtract(P0); //v2=p2-p0
 
-			Vector v1 = P1.subtract(P0);
-			Vector v2 = P2.subtract(P0);
+		//check the sign of the vectors
+		double sign = alignZero(v.dotProduct(v1.crossProduct(v2)));
 
-			double sign = alignZero(v.dotProduct(v1.crossProduct(v2)));
+		if (isZero(sign)) { //if it was 0 so return null
+			return null;
+		}
 
+		boolean positive = sign > 0; //True if the sign is positive (which means they both have the same sign)
+
+		//iterate through all vertices of the polygon
+		for (int i = vertices.size() - 1; i > 0; --i) {
+			//now check for the rest if the vertices
+			v1 = v2;
+			v2 = vertices.get(i).subtract(P0);
+
+			sign = alignZero(v.dotProduct(v1.crossProduct(v2)));
+
+			//if one of them is 0, return null
 			if (isZero(sign)) {
 				return null;
 			}
 
-			boolean positive = sign > 0;
-
-			//iterate through all vertices of the polygon
-			for (int i = vertices.size() - 1; i > 0; --i) {
-				v1 = v2;
-				v2 = vertices.get(i).subtract(P0);
-
-				sign = alignZero(v.dotProduct(v1.crossProduct(v2)));
-				if (isZero(sign)) {
-					return null;
-				}
-
-				if (positive != (sign > 0)) {
-					return null;
-				}
+			//if they don't have the same sign return null
+			if (positive != (sign > 0)) {
+				return null;
 			}
-
-			return result;
 		}
+
+		//update the geometry
+		for (GeoPoint gp : result) {
+			gp.geometry = this;
+		}
+
+		return result;
+	}
+
+
+//	@Override
+//	protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
+//
+//
+//			List<GeoPoint> result = plane.findGeoIntersections(ray);
+//			if (result == null) {
+//				return result;
+//			}
+//
+//			Point P0 = ray.getP0();
+//			Vector v = ray.getDir();
+//
+//			Point P1 = vertices.get(1);
+//			Point P2 = vertices.get(0);
+//
+//			Vector v1 = P1.subtract(P0);
+//			Vector v2 = P2.subtract(P0);
+//
+//			double sign = alignZero(v.dotProduct(v1.crossProduct(v2)));
+//
+//			if (isZero(sign)) {
+//				return null;
+//			}
+//
+//			boolean positive = sign > 0;
+//
+//			//iterate through all vertices of the polygon
+//			for (int i = vertices.size() - 1; i > 0; --i) {
+//				v1 = v2;
+//				v2 = vertices.get(i).subtract(P0);
+//
+//				sign = alignZero(v.dotProduct(v1.crossProduct(v2)));
+//				if (isZero(sign)) {
+//					return null;
+//				}
+//
+//				if (positive != (sign > 0)) {
+//					return null;
+//				}
+//			}
+//
+//			return result;
+//		}
 
 
 	}

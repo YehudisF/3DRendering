@@ -91,6 +91,59 @@ public class Vector extends Point {
         return new Vector(xyz.scale(scalar));
     }
 
+
+    /**
+     * Rotates the vector around the x axis
+     * @param alpha the amount to rotate in degrees
+     * @return the current vector
+     */
+    public Vector rotateX(double alpha) {
+        double radianAlpha = alpha * Math.PI / 180;
+
+        double x = head.getX();
+        double y = head.getY() * Math.cos(radianAlpha) - head.getZ() * Math.sin(radianAlpha);
+        double z = head.getY() * Math.sin(radianAlpha) + head.getZ() * Math.cos(radianAlpha);
+
+        head = new Point3D(x, y, z);
+        return this;
+    }
+
+
+    /**
+     * Rotates the vector around the y axis
+     * @param alpha the amount to rotate in degrees
+     * @return the current vector
+     */
+    public Vector rotateY(double alpha) {
+        double radianAlpha = alpha * Math.PI / 180;
+
+        double x = head.getX() * Math.cos(radianAlpha) + head.getZ() * Math.sin(radianAlpha);
+        double y = head.getY();
+        double z = -head.getX() * Math.sin(radianAlpha) + head.getZ() * Math.cos(radianAlpha);
+
+        head = new Point3D(x, y, z);
+        return this;
+    }
+
+
+    /**
+     * Rotates the vector around the z axis
+     * @param alpha the amount to rotate in degrees
+     * @return the current vector
+     */
+    public Vector rotateZ(double alpha) {
+        double radianAlpha = alpha * Math.PI / 180;
+
+        double x = head.getX() * Math.cos(radianAlpha) - head.getY() * Math.sin(radianAlpha);
+        double y = head.getX() * Math.sin(radianAlpha) + head.getY() * Math.cos(radianAlpha);
+        double z = head.getZ();
+
+        head = new Point3D(x, y, z);
+        return this;
+    }
+
+
+
 //    public boolean isZeroVector() {
 //        return xyz.equals(Double3.ZERO);
 //    }

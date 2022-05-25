@@ -4,6 +4,8 @@ package renderer;
 import primitives.*;
 import lighting.*;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.MissingResourceException;
 
 import static primitives.Util.isZero;
@@ -97,7 +99,7 @@ public class Camera {
      * @param i x value of pixel wanted
      * @return ray form the camera to Pixel[i,j]
      */
-    public Ray constructRay(int Nx, int Ny, int j, int i) {
+     public Ray constructRay(int Nx, int Ny, int j, int i) { //like construct ray thru pixel
         //Image center
         Point Pc = p0.add(vTo.scale(distance));
 
@@ -189,4 +191,94 @@ public class Camera {
         this._rayTracer = rayTracer;
         return this;
     }
+
+
+    /**
+     *
+     * @param nX
+     * @param nY
+     * @param j
+     * @param i
+     * @param screenWidth
+     * @param screenHeight
+     * @param screenDistance
+     * @return
+     */
+    private Point getPij(int nX, int nY, int j, int i, double screenWidth, double screenHeight, double screenDistance) {
+
+        // calculates  the intersection point of the to vector to the screen after it was scaled by the distance
+        Point Pc = p0.add(vTo.scale(screenDistance));
+
+        double Ry = screenHeight / nY; // how high a pixel is
+        double Rx = screenWidth / nX; // how wide a pixel is
+
+        double yi = ((i - nY / 2d) * Ry + Ry / 2d); // y coordinate
+        double xj = ((j - nX / 2d) * Rx + Rx / 2d); // x coordinate
+
+        Point Pij = Pc;
+
+        if (!isZero(xj)) {
+            Pij = Pij.add(vRight.scale(xj));
+        }
+        if (!isZero(yi)) {
+            Pij = Pij.subtract(vUp.scale(yi)); // Pij.add(_vUp.scale(-yi))
+        }
+        return Pij;
+    }
+
+
+    /**
+     *
+     * @param nX number of pixels widthwith
+     * @param nY number of pixels widthwith
+     * @param screenWidth ...
+     * @param screenHeight ...
+     * @param j number of wanted ray multiplicand
+     * @param i number of wanted ray multiplicand
+     * @param screenDist screen distance from camera
+     * @param size
+     * @return
+     */
+    public List<Ray> constructGridRaysThroughPixel(int nX, int nY, double screenWidth, double screenHeight,
+                                                   int j, int i, double screenDist, int size) {
+
+        double Rx = screenWidth / nX;//the length of pixel in X axis
+        double Ry = screenHeight / nY;//the length of pixel in Y axis
+
+        Point Pij = getPij(nX, nY, j, i, screenWidth, screenHeight, screenDist);
+        Point tmp;
+        //-----SuperSampling-----
+        List<Ray> rays = new LinkedList<>();//the return list, construct Rays Through Pixels
+
+
+        double n = Math.floor(Math.sqrt(size));
+        int delta = (int) (n / 2d);
+
+        double gapX = Rx / n;
+        double gapY = Ry / n;
+
+/* ***********************************************************************
+             |(-3,-3)|(-3,-2)|(-3,-1)|(-3, 0)|(-3, 1)|(-3, 2)||(-3, 3)
+             |(-2,-3)|(-2,-2)|(-2,-1)|(-2, 0)|(-2, 1)|(-2, 2)||(-2, 3)
+             |(-1,-3)|(-1,-2)|(-1,-1)|(-1, 0)|(-1, 1)|(-1, 2)||(-1, 3)
+             |( 0,-3)|( 0,-2)|( 0,-1)|( 0, 0)|( 0, 1)|( 0, 2)||( 0, 3)
+             |( 1,-3)|( 1,-2)|( 1,-1)|( 1, 0)|( 1, 1)|( 1, 2)||( 1, 3)
+             |( 2,-3)|( 2,-2)|( 2,-1)|( 2, 0)|( 2, 1)|( 2, 2)||( 2, 3)
+             |( 3,-3)|( 3,-2)|( 3,-1)|( 3, 0)|( 3, 1)|( 3, 2)||( 3, 3)
+*************************************************************************** */
+        for (int row = -delta; row <= delta; row++) {
+            for (int col = -delta; col <= delta; col++) {
+                tmp = new Point(Pij);
+                if (!isZero(row)) {
+                    tmp = tmp.add(vRight.scale(row * gapX));
+                }
+                if (!isZero(col)) {
+                    tmp = tmp.add(vRight.scale(col * gapY));
+                }
+                rays.add(new Ray(p0, tmp.subtract(p0).normalize()));
+            }
+        }
+        return rays;
+    }
+
 }

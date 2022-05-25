@@ -42,7 +42,7 @@ public abstract class Intersectable {
    // protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray);
 
     public static class GeoPoint {
-        public final Geometry geometry;
+        public Geometry geometry;
         public final Point point;
 
 
