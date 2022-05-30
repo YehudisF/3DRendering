@@ -24,6 +24,11 @@ public class Camera {
     private double width;       // ViewPlane width
     private double height;      // ViewPlane height
 
+
+
+    private int numRays = 25
+            ; // number of rays per pixel for supersampling
+
     private ImageWriter _imageWriter;
     private RayTracer _rayTracer;
 
@@ -152,8 +157,10 @@ public class Camera {
             int nY = _imageWriter.getNy();
             for (int i = 0; i < nY; i++) {
                 for (int j = 0; j < nX; j++) {
-                    Ray ray = constructRay(nX, nY, j, i);
-                    Color pixelColor = _rayTracer.traceRay(ray);
+                    List<Ray>  rays = constructGridRaysThroughPixel(nX,nY,j,i);
+               //     Ray ray = constructRay(nX, nY, j, i);
+                //    Color pixelColor = _rayTracer.traceRay(ray);
+                    Color pixelColor = _rayTracer.averageColor(rays);
                     _imageWriter.writePixel(j, i, pixelColor);
                 }
             }
@@ -182,6 +189,15 @@ public class Camera {
 
     }
 
+    public int getNumRays() {
+        return numRays;
+    }
+
+    public Camera setNumRays(int numRays) {
+        this.numRays = numRays;
+        return this;
+    }
+
     public Camera setImageWriter(ImageWriter imageWriter) {
         this._imageWriter = imageWriter;
         return this;
@@ -199,18 +215,15 @@ public class Camera {
      * @param nY
      * @param j
      * @param i
-     * @param screenWidth
-     * @param screenHeight
-     * @param screenDistance
      * @return
      */
-    private Point getPij(int nX, int nY, int j, int i, double screenWidth, double screenHeight, double screenDistance) {
+    private Point getPij(int nX, int nY, int j, int i) {
 
         // calculates  the intersection point of the to vector to the screen after it was scaled by the distance
-        Point Pc = p0.add(vTo.scale(screenDistance));
+        Point Pc = p0.add(vTo.scale(distance));
 
-        double Ry = screenHeight / nY; // how high a pixel is
-        double Rx = screenWidth / nX; // how wide a pixel is
+        double Ry = height / nY; // how high a pixel is
+        double Rx = width / nX; // how wide a pixel is
 
         double yi = ((i - nY / 2d) * Ry + Ry / 2d); // y coordinate
         double xj = ((j - nX / 2d) * Rx + Rx / 2d); // x coordinate
@@ -231,27 +244,23 @@ public class Camera {
      *
      * @param nX number of pixels widthwith
      * @param nY number of pixels widthwith
-     * @param screenWidth ...
-     * @param screenHeight ...
      * @param j number of wanted ray multiplicand
      * @param i number of wanted ray multiplicand
-     * @param screenDist screen distance from camera
-     * @param size
+
      * @return
      */
-    public List<Ray> constructGridRaysThroughPixel(int nX, int nY, double screenWidth, double screenHeight,
-                                                   int j, int i, double screenDist, int size) {
+    public List<Ray> constructGridRaysThroughPixel(int nX, int nY, int j, int i) {
 
-        double Rx = screenWidth / nX;//the length of pixel in X axis
-        double Ry = screenHeight / nY;//the length of pixel in Y axis
+        double Rx = width / nX;//the length of pixel in X axis
+        double Ry = height / nY;//the length of pixel in Y axis
 
-        Point Pij = getPij(nX, nY, j, i, screenWidth, screenHeight, screenDist);
+        Point Pij = getPij(nX, nY, j, i);
         Point tmp;
         //-----SuperSampling-----
         List<Ray> rays = new LinkedList<>();//the return list, construct Rays Through Pixels
 
 
-        double n = Math.floor(Math.sqrt(size));
+        double n = Math.floor(Math.sqrt(numRays));
         int delta = (int) (n / 2d);
 
         double gapX = Rx / n;
@@ -279,6 +288,34 @@ public class Camera {
             }
         }
         return rays;
+    }
+
+
+
+    /**
+     * Adds the given amount to the camera's position
+     *
+     * @return the current camera
+     */
+    public Camera move(Double3 amount) {
+        p0 = p0.add(new Vector(amount));
+        return this;
+    }
+
+    /**
+     * Rotates the camera around the axes with the given angles
+     *
+     * @param x angles to rotate around the x axis
+     * @param y angles to rotate around the y axis
+     * @param z angles to rotate around the z axis
+     * @return the current camera
+     */
+    public Camera rotate(double x, double y, double z) {
+        vTo = vTo.rotateX(x).rotateY(y).rotateZ(z);
+        vUp = vUp.rotateX(x).rotateY(y).rotateZ(z);
+        vRight = vTo.crossProduct(vUp);
+
+        return this;
     }
 
 }

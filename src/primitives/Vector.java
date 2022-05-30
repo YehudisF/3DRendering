@@ -1,6 +1,7 @@
 package primitives;
 
 public class Vector extends Point {
+
     public Vector(double x, double y, double z) {
 //        super(x,y,z);
 //        if(xyz.equals(Double3.ZERO))
@@ -18,6 +19,11 @@ public class Vector extends Point {
         if (xyz.equals(Double3.ZERO)) {
             throw new IllegalArgumentException("Vector(0,0,0) is not allowed");
         }
+    }
+
+    public Vector add(Vector other)
+    {
+        return new Vector(xyz.add(other.xyz));
     }
 
     /**
@@ -100,12 +106,12 @@ public class Vector extends Point {
     public Vector rotateX(double alpha) {
         double radianAlpha = alpha * Math.PI / 180;
 
-        double x = head.getX();
-        double y = head.getY() * Math.cos(radianAlpha) - head.getZ() * Math.sin(radianAlpha);
-        double z = head.getY() * Math.sin(radianAlpha) + head.getZ() * Math.cos(radianAlpha);
+        double x = getX();
+        double y = getY() * Math.cos(radianAlpha) - getZ() * Math.sin(radianAlpha);
+        double z = getY() * Math.sin(radianAlpha) + getZ() * Math.cos(radianAlpha);
 
-        head = new Point3D(x, y, z);
-        return this;
+
+        return new Vector(x,y,z);
     }
 
 
@@ -117,12 +123,11 @@ public class Vector extends Point {
     public Vector rotateY(double alpha) {
         double radianAlpha = alpha * Math.PI / 180;
 
-        double x = head.getX() * Math.cos(radianAlpha) + head.getZ() * Math.sin(radianAlpha);
-        double y = head.getY();
-        double z = -head.getX() * Math.sin(radianAlpha) + head.getZ() * Math.cos(radianAlpha);
+        double x = getX() * Math.cos(radianAlpha) + getZ() * Math.sin(radianAlpha);
+        double y = getY();
+        double z = -getX() * Math.sin(radianAlpha) + getZ() * Math.cos(radianAlpha);
 
-        head = new Point3D(x, y, z);
-        return this;
+        return new Vector(x,y,z);
     }
 
 
@@ -134,12 +139,11 @@ public class Vector extends Point {
     public Vector rotateZ(double alpha) {
         double radianAlpha = alpha * Math.PI / 180;
 
-        double x = head.getX() * Math.cos(radianAlpha) - head.getY() * Math.sin(radianAlpha);
-        double y = head.getX() * Math.sin(radianAlpha) + head.getY() * Math.cos(radianAlpha);
-        double z = head.getZ();
+        double x = getX() * Math.cos(radianAlpha) - getY() * Math.sin(radianAlpha);
+        double y = getX() * Math.sin(radianAlpha) + getY() * Math.cos(radianAlpha);
+        double z = getZ();
 
-        head = new Point3D(x, y, z);
-        return this;
+        return new Vector(x,y,z);
     }
 
 

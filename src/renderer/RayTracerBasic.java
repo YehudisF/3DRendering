@@ -7,9 +7,13 @@ import primitives.*;
 import scene.Scene;
 import geometries.Intersectable.GeoPoint;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
+import static java.lang.Math.random;
 import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
 
 /**
  * derivative class from RayTracer traces ray path in the scene noting intersections
@@ -20,10 +24,20 @@ public class RayTracerBasic extends RayTracer {
     private static final int MAX_CALC_COLOR_LEVEL = 10;
     private static final Double MIN_CALC_COLOR_K = 0.001;
     public static final Double3 INITIAL_K = Double3.ONE;
+    private int glossinessRays=10;
 
 
     public RayTracerBasic(Scene scene) {
         super(scene);
+    }
+
+    public RayTracerBasic setGlossinessRays(int glossinessRays) {
+        if (glossinessRays <= 0) {
+            throw new IllegalArgumentException("number of glossiness rays should be greater than 0");
+        }
+
+        this.glossinessRays = glossinessRays;
+        return this;
     }
 
     /**
@@ -62,6 +76,16 @@ public class RayTracerBasic extends RayTracer {
     }
 
 
+    @Override
+    public Color averageColor(List<Ray> rays){
+        Color color=Color.BLACK;
+        for( Ray ray:rays){
+            color=color.add(traceRay(ray));
+        }
+        return color.reduce(Double.valueOf(rays.size()));
+    }
+
+
     private synchronized Color calcColour(GeoPoint gp, Ray ray, int level, Double3 k) {
 
         Color color = gp.geometry.getEmission().add(calcLocalEffects(gp, ray, k));
@@ -71,33 +95,33 @@ public class RayTracerBasic extends RayTracer {
 
 
 
-
-    private Color getPixelRaysGridColor(Camera camera, int nx, int ny, double width, double height, Pixel pixel, double distance) {
-        Color resultColor = Color.BLACK;
-        Color backgroundColor = scene.getBackground();
-        Color ambientLightColor = scene.getAmbientLight().getIntensity();
-        Color rayColor;
-        GeoPoint closestPoint;
 //
-        List<Ray> rays = camera.constructGridRaysThroughPixel(nx, ny, width, height, pixel.col, pixel.row, distance, _rayCounter);
-//        List<Ray> rays = camera.constructRandomRaysBeamThroughPixel(nx, ny, width, height, pixel.col, pixel.row, distance, _beamRadius, _rayCounter);
-//        Ray mainray = camera.constructRayThroughPixel(nx, ny, width, height, pixel.col, pixel.row, distance);
-//        rays.add(mainray);
-        for (Ray ray : rays) {
-            closestPoint = findClosestIntersection(ray);
-            if (closestPoint != null) {
-                resultColor = resultColor.add(calcColour(closestPoint, ray, MAX_CALC_COLOR_LEVEL, 1d));
-            } else {
-                resultColor = resultColor.add(backgroundColor);
-            }
-        }
-        resultColor = resultColor.reduce(rays.size());
-
-        if (!resultColor.equals(backgroundColor)) {
-            resultColor.add(ambientLightColor);
-        }
-        return resultColor;
-    }
+//    private Color getPixelRaysGridColor(Camera camera, int nx, int ny, double width, double height, Pixel pixel, double distance) {
+//        Color resultColor = Color.BLACK;
+//        Color backgroundColor = scene.getBackground();
+//        Color ambientLightColor = scene.getAmbientLight().getIntensity();
+//        Color rayColor;
+//        GeoPoint closestPoint;
+////
+//        List<Ray> rays = camera.constructGridRaysThroughPixel(nx, ny, width, height, pixel.col, pixel.row, distance, _rayCounter);
+////        List<Ray> rays = camera.constructRandomRaysBeamThroughPixel(nx, ny, width, height, pixel.col, pixel.row, distance, _beamRadius, _rayCounter);
+////        Ray mainray = camera.constructRayThroughPixel(nx, ny, width, height, pixel.col, pixel.row, distance);
+////        rays.add(mainray);
+//        for (Ray ray : rays) {
+//            closestPoint = findClosestIntersection(ray);
+//            if (closestPoint != null) {
+//                resultColor = resultColor.add(calcColour(closestPoint, ray, MAX_CALC_COLOR_LEVEL, 1d));
+//            } else {
+//                resultColor = resultColor.add(backgroundColor);
+//            }
+//        }
+//        resultColor = resultColor.reduce(rays.size());
+//
+//        if (!resultColor.equals(backgroundColor)) {
+//            resultColor.add(ambientLightColor);
+//        }
+//        return resultColor;
+//    }
 
 
 
@@ -139,6 +163,38 @@ public class RayTracerBasic extends RayTracer {
         return new Ray(pointGeo.point, inRay.getDir(), n);
     }
 
+    /**
+     * Constructs randomized refraction rays at the intersection point according to kG.
+     * If kG is 1 then only one ray is returned with the vector v (which is the specular vector).
+     *
+     * @param point the intersection point
+     * @param v     the intersection's ray direction
+     * @param n     the normal at the intersection point
+     * @param kG    the glossiness parameter in range of [0,1], where 0 - matte, 1 - glossy
+     * @return randomized refraction rays
+     */
+    private Ray[] constructRefractedRays(Point point, Vector v, Vector n, double kG, int numOfRays) {
+        // If kG is equals to 1 then return only 1 ray, the specular ray (v)
+        if (isZero(kG - 1)) {
+            return new Ray[]{new Ray(point, v, n)};
+        }
+
+        Vector[] randomizedVectors = createRandomVectorsOnSphere(n, numOfRays);
+
+        // If kG is equals to 0 then select all the randomized vectors
+        if (isZero(kG)) {
+            return Arrays.stream(randomizedVectors)
+                    .map(vector -> new Ray(point, vector, n))
+                    .toArray(Ray[]::new);
+        }
+
+        // If kG is in range (0,1) then move the randomized vectors towards the specular vector (v)
+        return Arrays.stream(randomizedVectors)
+                .map(vector -> new Ray(point,
+                        vector.scale(1 - kG).add(v.scale(kG)), n))
+                .toArray(Ray[]::new);
+    }
+
     private Ray constructReflectedRay(Vector n, Point pointGeo, Ray inRay) {
 
         Vector v = inRay.getDir();
@@ -152,6 +208,88 @@ public class RayTracerBasic extends RayTracer {
 
         Vector r = v.subtract(n.scale(2 * vn)).normalize();
         return new Ray(pointGeo, r, n);
+    }
+
+    /**
+     * Constructs randomized reflection rays at the intersection point according to kG.
+     * If kG is 1 then only one ray is returned with the specular vector
+     *
+     * @param point the intersection point
+     * @param v     the intersection's ray direction
+     * @param n     the normal at the intersection point
+     * @param kG    the glossiness parameter in range of [0,1], where 0 - matte, 1 - glossy
+     * @return randomized reflection rays
+     */
+    private Ray[] constructReflectedRays(Point point, Vector v, Vector n, double kG, int numOfRays) {
+        Vector n2vn = n.scale(-2 * v.dotProduct(n));
+        Vector r = v.add(n2vn);
+
+        // If kG is equals to 1 then return only 1 ray, the specular ray (r)
+        if (isZero(kG - 1)) {
+            return new Ray[]{new Ray(point, r, n)};
+        }
+
+        Vector[] randomizedVectors = createRandomVectorsOnSphere(n, numOfRays);
+
+        // If kG is equals to 0 then select all the randomized vectors
+        if (isZero(kG)) {
+            return Arrays.stream(randomizedVectors)
+                    .map(vector -> new Ray(point, vector, n))
+                    .toArray(Ray[]::new);
+        }
+
+        // If kG is in range (0,1) then move the randomized vectors towards the specular vector (v)
+        return Arrays.stream(randomizedVectors)
+                .map(vector -> new Ray(point,
+                        vector.scale(1 - kG).add(r.scale(kG)), n))
+                .toArray(Ray[]::new);
+    }
+
+    /**
+     * Creates random vectors on the unit hemisphere with a given normal on the hemisphere's bottom.<br>
+     * source: https://my.eng.utah.edu/~cs6958/slides/pathtrace.pdf#page=18
+     *
+     * @param n normal to the hemisphere's bottom
+     * @return the randomized vectors
+     */
+    private Vector[] createRandomVectorsOnSphere(Vector n, int numOfVectors) {
+        // pick axis with smallest component in normal
+        // in order to prevent picking an axis parallel
+        // to the normal and eventually creating zero vector
+        Vector axis;
+        if (Math.abs(n.getX()) < Math.abs(n.getY()) && Math.abs(n.getX()) < Math.abs(n.getZ())) {
+            axis = new Vector(1, 0, 0);
+        } else if (Math.abs(n.getY()) < Math.abs(n.getZ())) {
+            axis = new Vector(0, 1, 0);
+        } else {
+            axis = new Vector(0, 0, 1);
+        }
+
+        // find two vectors orthogonal to the normal
+        Vector x = n.crossProduct(axis);
+        Vector z = n.crossProduct(x);
+
+        Vector[] randomVectors = new Vector[numOfVectors];
+        for (int i = 0; i < numOfVectors; i++) {
+            // pick a point on the hemisphere bottom
+            double u, v, u2, v2;
+            do {
+                u = random() * 2 - 1;
+                v = random() * 2 - 1;
+                u2 = u * u;
+                v2 = v * v;
+            } while (u2 + v2 >= 1);
+
+            // calculate the height of the point
+            double w = Math.sqrt(1 - u2 - v2);
+
+            // create the new vector according to the base (x, n, z) and the coordinates (u, w, v)
+            randomVectors[i] = x.scale(u)
+                    .add(z.scale(v))
+                    .add(n.scale(w));
+        }
+
+        return randomVectors;
     }
 
 //
@@ -270,21 +408,30 @@ public class RayTracerBasic extends RayTracer {
         // Double3 MIN_CALC=new Double3(MIN_CALC_COLOR_K,MIN_CALC_COLOR_K,MIN_CALC_COLOR_K);
         Double3 kr = material.kR;
         Double3 kkr = k.product(kr);
+        Vector v=inRay.getDir();
         Vector n = geopoint.geometry.getNormal(geopoint.point);//
         if (!kkr.lowerThan(MIN_CALC_COLOR_K)) {
-            Ray reflectedRay = constructReflectedRay(n, geopoint.point, inRay);
-            GeoPoint reflectedPoint = findClosestIntersection(reflectedRay);
-            if (reflectedPoint != null) {
-                color = color.add(calcColour(reflectedPoint, reflectedRay, level - 1, kkr).scale(kr));
+            //Ray reflectedRay = constructReflectedRay(n, geopoint.point, inRay);
+            Ray[] reflectedRays = constructReflectedRays(geopoint.point, v, n, material.kG, glossinessRays);
+            for (Ray reflectedRay : reflectedRays)
+            {
+                GeoPoint reflectedPoint = findClosestIntersection(reflectedRay);
+                if (reflectedPoint != null)
+                {
+                    color = color.add(calcColour(reflectedPoint, reflectedRay, level - 1, kkr).scale(kr));
+                }
             }
         }
         Double3 kt = material.kT;
         Double3 kkt = k.product(kt);
         if (!kkt.lowerThan(MIN_CALC_COLOR_K)) {
-            Ray refractedRay = constructRefractedRay(geopoint, inRay, n);
-            GeoPoint refractedPoint = findClosestIntersection(refractedRay);
-            if (refractedPoint != null) {
-                color = color.add(calcColour(refractedPoint, refractedRay, level - 1, kkt).scale(kt));
+            //Ray refractedRay = constructRefractedRay(geopoint, inRay, n);
+            Ray[] refractedRays = constructRefractedRays(geopoint.point, v, n.scale(-1), material.kG, glossinessRays);
+            for (Ray refractedRay : refractedRays) {
+                GeoPoint refractedPoint = findClosestIntersection(refractedRay);
+                if (refractedPoint != null) {
+                    color = color.add(calcColour(refractedPoint, refractedRay, level - 1, kkt).scale(kt));
+                }
             }
         }
         return color;

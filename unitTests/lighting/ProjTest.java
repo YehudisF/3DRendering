@@ -16,7 +16,8 @@ public class ProjTest {
     {
 
         Camera camera = new Camera(new Point(0, 150, 600), new Vector(0, -0.1, -0.5), new Vector(0, 0.5, -0.1)) //
-                .setVPSize(150, 150).setVPDistance(1000);
+                .setVPSize(150, 150).setVPDistance(1000)
+                .move(new Double3(80d,0d,0d)).rotate(0,7,0d).setNumRays(81);
         Scene scene= new Scene.SceneBuilder("Test Scene").setBackground(new Color(BLACK)).build();
 //        scene.getLights().add( //
 //                new SpotLight(new Color(PINK), new Point(-50, -50, 200), new Vector(1, 1, -3)) //
@@ -35,7 +36,8 @@ public class ProjTest {
 //        scene.getLights().add(new SpotLight(new Color(700, 400, 400),new Point(0,50,-50),new Vector(0,-1,-1)).setkL(4E-5).setkQ(2E-7));
 //        scene.getLights().add(new SpotLight(new Color(700, 400, 400),new Point(2,500,500),new Vector(-0.01,-0.4,0.5)));
         Color c;
-        for (int i=-30;i<50;i+=30)
+
+        for (int i=-50;i<50;i+=30)
             for(int j=-150;j<90;j+=30)
             {
                 if(((i/10)%2==0 &&(j/10)%2==0)||(Math.abs((i/10)%2)==1&& Math.abs((j/10)%2)==1))
@@ -46,6 +48,50 @@ public class ProjTest {
                 scene.getGeometries().add( new Polygon(new Point(i+0.0, 0.0, j+0.0), new Point(i + 30, 0.0,j+0.0 ), new Point(i + 30,0.0 ,j + 30 ), new Point(i+0.0, 0.0, j + 30)).setEmission(c)
                 );
             }
+        // the wall on the side
+        for (int i=0;i<60;i+=10)
+            for(int j=-150;j<90;j+=10)
+            {
+                if(((i/10)%2==0 &&(j/10)%2==0)||(Math.abs((i/10)%2)==1&& Math.abs((j/10)%2)==1))
+                    c=new Color(WHITE);
+                else
+                    c=new Color(GRAY);
+
+                scene.getGeometries().add( new Polygon(new Point(-50, i+0.0, j+0.0), new Point(-50, i+0.0,j+10 ), new Point(-50,i+10 ,j + 10 ), new Point(-50, i+10, j + 0.0)).setEmission(c)
+                );
+            }
+        // the back wall
+        for (int i=-50;i<80;i+=10)
+            for(int j=0;j<60;j+=10)
+            {
+                if(((i/10)%2==0 &&(j/10)%2==0)||(Math.abs((i/10)%2)==1&& Math.abs((j/10)%2)==1))
+                    c=new Color(WHITE);
+                else
+                    c=new Color(GRAY);
+
+                scene.getGeometries().add( new Polygon(new Point(i+0.0, j+0.0, -150), new Point(i+10, j+0.0,-150 ), new Point(i+10,j+10 ,-150 ), new Point(i+0.0, j+10, -150)).setEmission(c)
+                );
+            }
+
+
+
+
+
+
+
+
+
+//        for (int i=-30;i<50;i+=30)
+//            for(int j=-150;j<90;j+=30)
+//            {
+//                if(((i/10)%2==0 &&(j/10)%2==0)||(Math.abs((i/10)%2)==1&& Math.abs((j/10)%2)==1))
+//                    c=new Color(WHITE);
+//                else
+//                    c=new Color(BLACK);
+//
+//                scene.getGeometries().add( new Polygon(new Point(i+0.0, 0.0, j+0.0), new Point(i + 30, 0.0,j+0.0 ), new Point(i + 30,0.0 ,j + 30 ), new Point(i+0.0, 0.0, j + 30)).setEmission(c)
+//                );
+//            }
 
 
 

@@ -6,10 +6,11 @@ package primitives;
  */
 public class Material {
     // all the fieds have a default value of 0, there is a default constructor
-    public Double3 kD = Double3.ZERO;
-    public Double3 kS = Double3.ZERO;
+    public Double3 kD = Double3.ZERO;// diffuse
+    public Double3 kS = Double3.ZERO;// specular
     public Double3 kT = Double3.ZERO; // transparancy attenuation factor
     public Double3 kR = Double3.ZERO; // reflection attenuation factor
+    public double kG  = 1.0;// glossy
     public int nShininess = 0;
 
     /**
@@ -108,6 +109,16 @@ public class Material {
      */
     public Material setnShininess(int nShininess) {
         this.nShininess = nShininess;
+        return this;
+    }
+
+    /**
+     * Chaining method for setting the glossiness of the material.
+     * @param kG the glossiness to set, value in range [0,1]
+     * @return the current material
+     */
+    public Material setkG(double kG) {
+        this.kG = Math.pow(kG, 0.5);
         return this;
     }
 }
