@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;
 
+import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
 
 /**
@@ -130,6 +131,41 @@ public class Camera {
         return new Ray(p0, Pij.subtract(p0));
     }
 
+
+
+//    /**
+//     * get the center point of the pixel in the view plane
+//     * @param nX number of pixels in the width of the view plane
+//     * @param nY number of pixels in the height of the view plane
+//     * @param j index row in the view plane
+//     * @param i index column in the view plane
+//     * @return the center point of the pixel
+//     */
+//    private Point getCenterOfPixel(int nX, int nY, int j, int i){
+//        // calculate the ratio of the pixel by the height and by the width of the view plane
+//        // the ratio Ry = h/Ny, the height of the pixel
+//        double rY = alignZero(height / nY);
+//        // the ratio Rx = w/Nx, the width of the pixel
+//        double rX = alignZero(width / nX);
+//
+//        // Xj = (j - (Nx -1)/2) * Rx
+//        double xJ = alignZero((j - ((nX - 1d) / 2d)) * rX);
+//        // Yi = -(i - (Ny - 1)/2) * Ry
+//        double yI = alignZero(- (i - ((nY - 1d) / 2d)) * rY);
+//
+//        Point pIJ = p0;
+//
+//        if (xJ != 0d) {
+//            pIJ = pIJ.add(vRight.scale(xJ));
+//        }
+//        if (yI != 0d) {
+//            pIJ = pIJ.add(vUp.scale(yI));
+//        }
+//        return pIJ;
+//    }
+
+
+
     /**
      * calls the original write to image to create an image from rendered scene
      */
@@ -158,15 +194,26 @@ public class Camera {
             for (int i = 0; i < nY; i++) {
                 for (int j = 0; j < nX; j++) {
                     List<Ray>  rays = constructGridRaysThroughPixel(nX,nY,j,i);
+                    Ray middleRay = constructRay(nX,nY,j,i);
                //     Ray ray = constructRay(nX, nY, j, i);
                 //    Color pixelColor = _rayTracer.traceRay(ray);
-                    Color pixelColor = _rayTracer.averageColor(rays);
+                    Color pixelColor = _rayTracer.averageColor(rays,middleRay);
                     _imageWriter.writePixel(j, i, pixelColor);
                 }
             }
         } catch (MissingResourceException e) {
             throw new UnsupportedOperationException("Not implemented yet" + e.getClassName());
         }
+        return this;
+    }
+
+
+    public Camera setSoftShadow(boolean isSoft){
+        _rayTracer.setSoftshadows(isSoft);
+        return this;
+    }
+    public Camera setRadiusBeam(double radiusBeam){
+        _rayTracer.setBeamRadius(radiusBeam);
         return this;
     }
 
@@ -266,15 +313,7 @@ public class Camera {
         double gapX = Rx / n;
         double gapY = Ry / n;
 
-/* ***********************************************************************
-             |(-3,-3)|(-3,-2)|(-3,-1)|(-3, 0)|(-3, 1)|(-3, 2)||(-3, 3)
-             |(-2,-3)|(-2,-2)|(-2,-1)|(-2, 0)|(-2, 1)|(-2, 2)||(-2, 3)
-             |(-1,-3)|(-1,-2)|(-1,-1)|(-1, 0)|(-1, 1)|(-1, 2)||(-1, 3)
-             |( 0,-3)|( 0,-2)|( 0,-1)|( 0, 0)|( 0, 1)|( 0, 2)||( 0, 3)
-             |( 1,-3)|( 1,-2)|( 1,-1)|( 1, 0)|( 1, 1)|( 1, 2)||( 1, 3)
-             |( 2,-3)|( 2,-2)|( 2,-1)|( 2, 0)|( 2, 1)|( 2, 2)||( 2, 3)
-             |( 3,-3)|( 3,-2)|( 3,-1)|( 3, 0)|( 3, 1)|( 3, 2)||( 3, 3)
-*************************************************************************** */
+
         for (int row = -delta; row <= delta; row++) {
             for (int col = -delta; col <= delta; col++) {
                 tmp = new Point(Pij);

@@ -20,10 +20,12 @@ public class Cylinder extends Tube
      * Cylinder's bottomCap.
      */
     protected final Plane bottomCap;
+   // protected final Circle bottomCap;
     /**
      * Cylinder's topCap.
      */
-    protected final Plane topCap;
+   protected final Plane topCap;
+   // protected final Circle topCap;
 
     /**
      * Creates a new cylinder by a given axis ray, radius and height.
@@ -43,8 +45,10 @@ public class Cylinder extends Tube
         height = h;
         Point p0 = axisRay.getP0();
         Point p1 = axisRay.getPoint(height);
-        bottomCap = new Plane(p0, axisRay.getDir().scale(-1) /* Sets the normal directed outside of the cylinder */);
-        topCap = new Plane(p1, axisRay.getDir());
+        //bottomCap = new Circle(p0,radius,axisRay.getDir().scale(-1));
+        bottomCap = new Plane(p1, axisRay.getDir() /* Sets the normal directed outside of the cylinder */);
+        //topCap = new Circle(p1,radius, axisRay.getDir());
+        topCap = new Plane(p0, axisRay.getDir().scale(-1d));
     }
 
     /**
@@ -93,10 +97,61 @@ public class Cylinder extends Tube
                 ", radius=" + radius +
                 '}';
     }
+
+    @Override
+    public List<GeoPoint> findIntersections(Ray ray, double maxDistance) {
+
+        //provided by a student ( i forgot his name)
+        List<GeoPoint> intersections = super.findIntersections(ray, maxDistance);
+        if (intersections == null) {
+            return null;
+        }
+        Vector va = this.axisRay.getDir();
+        Point A = this.axisRay.getP0();
+        Point B = this.axisRay.getPoint(height);
+        List<GeoPoint> intersectionsCylinder = new LinkedList<>();
+        double lowerBound, upperBound;
+        for (GeoPoint gPoint : intersections) {
+            lowerBound = va.dotProduct(gPoint.point.subtract(A));
+            upperBound = va.dotProduct(gPoint.point.subtract(B));
+            if (lowerBound > 0 && upperBound < 0) {
+                // the check for distance, if the intersection point is beyond the distance
+                if (alignZero(gPoint.point.distance(ray.getP0()) - maxDistance) <= 0)
+                    intersectionsCylinder.add(gPoint);
+            }
+        }
+        Plane topA = new Plane(emission, getMaterial(), A, va);
+        Plane bottomB = new Plane(_emissionColor, _material, B, va);
+        List<GeoPoint> intersectionPlaneA = topA.findIntersections(ray, maxDistance);
+        List<GeoPoint> intersectionPlaneB = bottomB.findIntersections(ray, maxDistance);
+        if (intersectionPlaneA == null && intersectionPlaneB == null) {
+            return intersectionsCylinder;
+        }
+        Point3D q3, q4;
+        if (intersectionPlaneA != null) {
+            q3 = intersectionPlaneA.get(0)._point;
+            if (q3.subtract(A).lengthSquared() < _radius * _radius) {
+                intersectionsCylinder.add(intersectionPlaneA.get(0));
+            }
+        }
+        if (intersectionPlaneB != null) {
+            q4 = intersectionPlaneB.get(0)._point;
+            if (q4.subtract(B).lengthSquared() < _radius * _radius) {
+                intersectionsCylinder.add(intersectionPlaneB.get(0));
+            }
+        }
+        if (intersectionsCylinder.isEmpty()) {
+            return null;
+        }
+        return intersectionsCylinder;
+    }
+
+
+
     @Override
     public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance)  {
         Point p0 = axisRay.getP0();
-        Point p1 = axisRay.getPoint(height);
+        Point p1 = axisRay.getPoint(-height);
         List<GeoPoint> result = null;
 
         // Find the tube's intersections
@@ -137,7 +192,7 @@ public class Cylinder extends Tube
         if (cap0Point != null) {
             // Checks if the intersection point is on the cap
             GeoPoint gp = cap0Point.get(0);
-            if (gp.point.distanceSquared(p0) < radius * radius) {
+            if (gp.point.distanceSquared(p1) <= radius * radius) {
                 if (result == null) {
                     result = new LinkedList<>();
                 }
@@ -154,7 +209,8 @@ public class Cylinder extends Tube
         if (cap1Point != null) {
             // Checks if the intersection point is on the cap
             GeoPoint gp = cap1Point.get(0);
-            if (gp.point.distanceSquared(p1) < radius * radius) {
+          //  if (gp.point.distanceSquared(p0) < radius * radius) {
+            if (gp.point.distance(p0) <= radius) {
                 if (result == null) {
                     return List.of(gp);
                 }
