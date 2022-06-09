@@ -9,6 +9,15 @@ public abstract class Geometry extends Intersectable {
 
     protected Color emission = Color.BLACK;
     private Material material=new Material();
+
+    public Geometry(Color emissionLight, Material material) {
+        emission = emissionLight;
+        this.material = material;
+    }
+
+    public Geometry() {
+    }
+
     /**
      * setter for material according to builder design pattern
      * @param material

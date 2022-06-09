@@ -75,8 +75,7 @@ public class RayTracerBasic extends RayTracer {
     }
 
     private Color calcColour(GeoPoint gp, Ray ray,int rayCounter) {
-//        return scene.getAmbienLight().getIntensity()
-//                .add(calcLocalEffects(gp, ray));
+
         return calcColour(gp, ray, MAX_CALC_COLOR_LEVEL, INITIAL_K,rayCounter)
                 .add(scene.getAmbienLight().getIntensity());
     }
@@ -103,35 +102,6 @@ public class RayTracerBasic extends RayTracer {
 
 
 
-//
-//    private Color getPixelRaysGridColor(Camera camera, int nx, int ny, double width, double height, Pixel pixel, double distance) {
-//        Color resultColor = Color.BLACK;
-//        Color backgroundColor = scene.getBackground();
-//        Color ambientLightColor = scene.getAmbientLight().getIntensity();
-//        Color rayColor;
-//        GeoPoint closestPoint;
-////
-//        List<Ray> rays = camera.constructGridRaysThroughPixel(nx, ny, width, height, pixel.col, pixel.row, distance, _rayCounter);
-////        List<Ray> rays = camera.constructRandomRaysBeamThroughPixel(nx, ny, width, height, pixel.col, pixel.row, distance, _beamRadius, _rayCounter);
-////        Ray mainray = camera.constructRayThroughPixel(nx, ny, width, height, pixel.col, pixel.row, distance);
-////        rays.add(mainray);
-//        for (Ray ray : rays) {
-//            closestPoint = findClosestIntersection(ray);
-//            if (closestPoint != null) {
-//                resultColor = resultColor.add(calcColour(closestPoint, ray, MAX_CALC_COLOR_LEVEL, 1d));
-//            } else {
-//                resultColor = resultColor.add(backgroundColor);
-//            }
-//        }
-//        resultColor = resultColor.reduce(rays.size());
-//
-//        if (!resultColor.equals(backgroundColor)) {
-//            resultColor.add(ambientLightColor);
-//        }
-//        return resultColor;
-//    }
-
-
 
     /**
      * calculates the concurrent local effects such a specular and diffusion effects
@@ -153,16 +123,19 @@ public class RayTracerBasic extends RayTracer {
             Vector l = lightSource.getL(gp.point);
             double nl = alignZero(n.dotProduct(l));
             if (nl * nv > 0) { // sign(nl) == sing(nv)
-                if(softshadows){
-                    ktr = transparencyBeam(lightSource,n,gp,rayCounter);
+                if (softshadows) {
+                    ktr = transparencyBeam(lightSource, n, gp, rayCounter);
                 }
                 // if(transparency(gp,lightSource,n,nl,nv,l)) {
-                ktr = transparency(l, n, lightSource, gp);
-                if (!(ktr.product(k).lowerThan(MIN_CALC_COLOR_K))) {
-                    Color iL = lightSource.getIntensity(gp.point).scale(ktr);
-                    color = color.add(
-                            iL.scale(calcDiffusive(material, nl)),
-                            iL.scale(calcSpecular(material, n, l, nl, v)));
+                else {
+                    ktr = transparency(l, n, lightSource, gp);
+                }
+                    if (!(ktr.product(k).lowerThan(MIN_CALC_COLOR_K))) {
+                        Color iL = lightSource.getIntensity(gp.point).scale(ktr);
+                        color = color.add(
+                                iL.scale(calcDiffusive(material, nl)),
+                                iL.scale(calcSpecular(material, n, l, nl, v)));
+
                 }
             }
         }
@@ -309,7 +282,7 @@ public class RayTracerBasic extends RayTracer {
         List<Vector> beamL = lightSource.getBeamL(geoPoint.point, beamRadius, rayCounter);
 
         for (Vector vl : beamL) {
-            tempKtr.add(transparency(vl,n,lightSource, geoPoint));
+           tempKtr = tempKtr.add(transparency(vl,n,lightSource, geoPoint));
         }
         tempKtr = tempKtr.reduce(beamL.size());
 

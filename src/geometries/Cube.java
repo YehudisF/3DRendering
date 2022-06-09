@@ -10,22 +10,26 @@ import java.util.List;
 public class Cube extends Intersectable{
     Point middle;
     double halfLength;
+    double halfWidth;
+    double halfHeight;
     Geometries squares;
 
-    public Cube(Point middle, double halfLength) {
+    public Cube(Point middle, double halfLength,double halfWidth, double halfHeight) {
         this.middle = middle;
         this.halfLength = halfLength;
+        this.halfHeight = halfHeight;
+        this.halfWidth = halfWidth;
         double x = middle.getX();
         double y = middle.getY();
         double z = middle.getZ();
-        Point bottomRightnorth = new Point(x+halfLength,y-halfLength,z+halfLength);
-        Point bottomRightsouth = new Point(x+halfLength,y-halfLength,z-halfLength);
-        Point bottomLeftnorth = new Point(x-halfLength,y-halfLength,z+halfLength);
-        Point bottomLeftsouth = new Point(x-halfLength,y-halfLength,z-halfLength);
-        Point topRightnorth = new Point(x+halfLength,y+halfLength,z+halfLength);
-        Point topRightsouth = new Point(x+halfLength,y+halfLength,z-halfLength);
-        Point topLeftnorth = new Point(x-halfLength,y+halfLength,z+halfLength);
-        Point topLeftsouth = new Point(x-halfLength,y+halfLength,z-halfLength);
+        Point bottomRightnorth = new Point(x+halfWidth,y-halfHeight,z+halfLength);
+        Point bottomRightsouth = new Point(x+halfWidth,y-halfHeight,z-halfLength);
+        Point bottomLeftnorth = new Point(x-halfWidth,y-halfHeight,z+halfLength);
+        Point bottomLeftsouth = new Point(x-halfWidth,y-halfHeight,z-halfLength);
+        Point topRightnorth = new Point(x+halfWidth,y+halfHeight,z+halfLength);
+        Point topRightsouth = new Point(x+halfWidth,y+halfHeight,z-halfLength);
+        Point topLeftnorth = new Point(x-halfWidth,y+halfHeight,z+halfLength);
+        Point topLeftsouth = new Point(x-halfWidth,y+halfHeight,z-halfLength);
 
 
         Polygon topSquare =(Polygon) new Polygon(topLeftnorth,topRightnorth,topRightsouth,topLeftsouth).setEmission(new Color(0,75,100))
@@ -54,6 +58,11 @@ public class Cube extends Intersectable{
                         .setnShininess(50));
         squares = new Geometries(topSquare,bottomSquare,rightSquare,leftSquare,foreSquare,backSquare);
     }
+
+//        public void setEmission(Color color){
+//        squares
+//        }
+//
 
     @Override
     protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {

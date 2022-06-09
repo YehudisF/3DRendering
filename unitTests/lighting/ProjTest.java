@@ -274,6 +274,7 @@ public class ProjTest {
                 new Sphere (new Point(-25,16,-75),16).setEmission(new Color(170,169,173)).setMaterial(material), // big sphere
                 new Sphere (new Point(0,4,0),4).setEmission(new Color(GREEN)).setMaterial(trMaterial),
                 new Sphere (new Point(25,4,-25),4).setEmission(new Color(yellow)).setMaterial(trMaterial)
+
     //   new Sphere (new Point(0,50,0),3).setEmission(new Color(YELLOW)).setMaterial(trMaterial)
 
 
@@ -295,6 +296,30 @@ public class ProjTest {
             .renderImage() //
                 .writeToImage();
 }
+
+
+
+    @Test
+    public void projTest3() {
+        Camera camera = new Camera(new Point(0, 150, 600), new Vector(0, -0.1, -0.5), new Vector(0, 0.5, -0.1)) //
+                .setVPSize(150, 150).setVPDistance(1000)
+                .move(new Double3(80d,0d,0d)).rotate(0,7,0d).setNumRays(1000);
+        Scene scene= new Scene.SceneBuilder("Test Scene").setBackground(new Color(BLACK)).build();
+
+        Material trMaterial = new Material().setKd(0.5).setKs(0.5).setKr(1d).setnShininess(300);
+        scene.setAmbientLight(new AmbientLight(new Color(MAGENTA),new Double3(0.25)));
+        scene.getLights().add(new SpotLight(new Color(700, 400, 400),new Point(5,200,0),new Vector(0,-0.2,0.8)).setkL(4E-5).setkQ(2E-7));
+
+        scene.getGeometries().add(
+        new Cube (new Point(30,20,5),10,20,2)//.setEmission(new Color(BLUE)).setMaterial(trMaterial)
+        );
+
+        ImageWriter imageWriter = new ImageWriter("myPicture3again", 600, 600); //myPicture3
+        camera.setImageWriter(imageWriter) //
+                .setRayTracer(new RayTracerBasic(scene)) //
+                .renderImage() //
+                .writeToImage();
+    }
 }
 
 

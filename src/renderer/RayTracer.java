@@ -32,7 +32,7 @@ public abstract class RayTracer {
     }
 
     public RayTracer setSoftshadows(boolean softshadows) {
-        softshadows = softshadows;
+        this.softshadows = softshadows;
         return this;
     }
 

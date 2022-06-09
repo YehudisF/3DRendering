@@ -99,10 +99,10 @@ public class Cylinder extends Tube
     }
 
     @Override
-    public List<GeoPoint> findIntersections(Ray ray, double maxDistance) {
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance) {
 
         //provided by a student ( i forgot his name)
-        List<GeoPoint> intersections = super.findIntersections(ray, maxDistance);
+        List<GeoPoint> intersections = super.findGeoIntersectionsHelper(ray, maxDistance);
         if (intersections == null) {
             return null;
         }
@@ -121,22 +121,22 @@ public class Cylinder extends Tube
             }
         }
         Plane topA = new Plane(emission, getMaterial(), A, va);
-        Plane bottomB = new Plane(_emissionColor, _material, B, va);
-        List<GeoPoint> intersectionPlaneA = topA.findIntersections(ray, maxDistance);
-        List<GeoPoint> intersectionPlaneB = bottomB.findIntersections(ray, maxDistance);
+        Plane bottomB = new Plane(emission, getMaterial(), B, va);
+        List<GeoPoint> intersectionPlaneA = topA.findGeoIntersections(ray,maxDistance);
+        List<GeoPoint> intersectionPlaneB = bottomB.findGeoIntersections(ray,maxDistance);
         if (intersectionPlaneA == null && intersectionPlaneB == null) {
             return intersectionsCylinder;
         }
-        Point3D q3, q4;
+        Point q3, q4;
         if (intersectionPlaneA != null) {
-            q3 = intersectionPlaneA.get(0)._point;
-            if (q3.subtract(A).lengthSquared() < _radius * _radius) {
+            q3 = intersectionPlaneA.get(0).point;
+            if (q3.subtract(A).lengthSquared() < radius * radius) {
                 intersectionsCylinder.add(intersectionPlaneA.get(0));
             }
         }
         if (intersectionPlaneB != null) {
-            q4 = intersectionPlaneB.get(0)._point;
-            if (q4.subtract(B).lengthSquared() < _radius * _radius) {
+            q4 = intersectionPlaneB.get(0).point;
+            if (q4.subtract(B).lengthSquared() < radius * radius) {
                 intersectionsCylinder.add(intersectionPlaneB.get(0));
             }
         }
@@ -148,79 +148,79 @@ public class Cylinder extends Tube
 
 
 
-    @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance)  {
-        Point p0 = axisRay.getP0();
-        Point p1 = axisRay.getPoint(-height);
-        List<GeoPoint> result = null;
-
-        // Find the tube's intersections
-        List<GeoPoint> tubePoints = super.findGeoIntersectionsHelper(ray,maxDistance);
-        if (tubePoints != null) {
-            if (tubePoints.size() == 2) {
-                // Checks if the intersection points are on the cylinder
-                GeoPoint q0 = tubePoints.get(0);
-                GeoPoint q1 = tubePoints.get(1);
-                boolean q0Intersects = isBetweenCaps(q0.point);
-                boolean q1Intersects = isBetweenCaps(q1.point);
-
-                if (q0Intersects && q1Intersects) {
-                    return tubePoints;
-                }
-
-                if (q0Intersects) {
-                    result = new LinkedList<>();
-                    result.add(q0);
-                } else if (q1Intersects) {
-                    result = new LinkedList<>();
-                    result.add(q1);
-                }
-            }
-
-            if (tubePoints.size() == 1) {
-                // Checks if the intersection point is on the cylinder
-                GeoPoint q = tubePoints.get(0);
-                if (isBetweenCaps(q.point)) {
-                    result = new LinkedList<>();
-                    result.add(q);
-                }
-            }
-        }
-
-        // Finds the bottom cap's intersections
-        List<GeoPoint> cap0Point = bottomCap.findGeoIntersections(ray);
-        if (cap0Point != null) {
-            // Checks if the intersection point is on the cap
-            GeoPoint gp = cap0Point.get(0);
-            if (gp.point.distanceSquared(p1) <= radius * radius) {
-                if (result == null) {
-                    result = new LinkedList<>();
-                }
-
-                result.add(gp);
-                if (result.size() == 2) {
-                    return result;
-                }
-            }
-        }
-
-        // Finds the top cap's intersections
-        List<GeoPoint> cap1Point = topCap.findGeoIntersections(ray);
-        if (cap1Point != null) {
-            // Checks if the intersection point is on the cap
-            GeoPoint gp = cap1Point.get(0);
-          //  if (gp.point.distanceSquared(p0) < radius * radius) {
-            if (gp.point.distance(p0) <= radius) {
-                if (result == null) {
-                    return List.of(gp);
-                }
-
-                result.add(gp);
-            }
-        }
-
-        return result;
-    }
+//    @Override
+//    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray, double maxDistance)  {
+//        Point p0 = axisRay.getP0();
+//        Point p1 = axisRay.getPoint(-height);
+//        List<GeoPoint> result = null;
+//
+//        // Find the tube's intersections
+//        List<GeoPoint> tubePoints = super.findGeoIntersectionsHelper(ray,maxDistance);
+//        if (tubePoints != null) {
+//            if (tubePoints.size() == 2) {
+//                // Checks if the intersection points are on the cylinder
+//                GeoPoint q0 = tubePoints.get(0);
+//                GeoPoint q1 = tubePoints.get(1);
+//                boolean q0Intersects = isBetweenCaps(q0.point);
+//                boolean q1Intersects = isBetweenCaps(q1.point);
+//
+//                if (q0Intersects && q1Intersects) {
+//                    return tubePoints;
+//                }
+//
+//                if (q0Intersects) {
+//                    result = new LinkedList<>();
+//                    result.add(q0);
+//                } else if (q1Intersects) {
+//                    result = new LinkedList<>();
+//                    result.add(q1);
+//                }
+//            }
+//
+//            if (tubePoints.size() == 1) {
+//                // Checks if the intersection point is on the cylinder
+//                GeoPoint q = tubePoints.get(0);
+//                if (isBetweenCaps(q.point)) {
+//                    result = new LinkedList<>();
+//                    result.add(q);
+//                }
+//            }
+//        }
+//
+//        // Finds the bottom cap's intersections
+//        List<GeoPoint> cap0Point = bottomCap.findGeoIntersections(ray);
+//        if (cap0Point != null) {
+//            // Checks if the intersection point is on the cap
+//            GeoPoint gp = cap0Point.get(0);
+//            if (gp.point.distanceSquared(p1) <= radius * radius) {
+//                if (result == null) {
+//                    result = new LinkedList<>();
+//                }
+//
+//                result.add(gp);
+//                if (result.size() == 2) {
+//                    return result;
+//                }
+//            }
+//        }
+//
+//        // Finds the top cap's intersections
+//        List<GeoPoint> cap1Point = topCap.findGeoIntersections(ray);
+//        if (cap1Point != null) {
+//            // Checks if the intersection point is on the cap
+//            GeoPoint gp = cap1Point.get(0);
+//          //  if (gp.point.distanceSquared(p0) < radius * radius) {
+//            if (gp.point.distance(p0) <= radius) {
+//                if (result == null) {
+//                    return List.of(gp);
+//                }
+//
+//                result.add(gp);
+//            }
+//        }
+//
+//        return result;
+//    }
 
     /**
      * Helper function that checks if a points is between the two caps (not on them, even on the edge)

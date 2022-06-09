@@ -1,8 +1,6 @@
 package geometries;
 
-import primitives.Point;
-import primitives.Ray;
-import primitives.Vector;
+import primitives.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -43,6 +41,14 @@ public class Plane extends Geometry implements FlatGeometry{
         Vector N = U.crossProduct(V);
         //right hand rule
         this._normal = N.normalize();
+    }
+
+
+    public Plane(Color emissionLight, Material material, Point point, Vector normal) {
+        super(emissionLight, material);
+
+        this._q0 = point;
+        this._normal = normal;
     }
 
     public Point getQ0() {
