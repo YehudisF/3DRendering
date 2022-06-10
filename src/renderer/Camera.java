@@ -4,6 +4,7 @@ package renderer;
 import primitives.*;
 import lighting.*;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -27,6 +28,8 @@ public class Camera {
 
 
 
+
+    private boolean antiAliasing = false;
     private int numRays = 25
             ; // number of rays per pixel for supersampling
 
@@ -113,8 +116,7 @@ public class Camera {
         double Ry =height/ Ny;
         double Rx = width/Nx;
 
-        //Pixel[i,j] center
-        Point Pij = Pc;
+
 
         //delta values for going to Pixel[i,j]  from Pc
 
@@ -122,47 +124,14 @@ public class Camera {
         double xJ =  (j - (Nx -1)/2d)* Rx;
 
         if (! isZero(xJ) ){
-            Pij = Pij.add(vRight.scale(xJ));
+            Pc = Pc.add(vRight.scale(xJ));
         }
         if (! isZero(yI)) {
-            Pij = Pij.add(vUp.scale(yI));
+            Pc = Pc.add(vUp.scale(yI));
         }
 
-        return new Ray(p0, Pij.subtract(p0));
+        return new Ray(p0, Pc.subtract(p0));
     }
-
-
-
-//    /**
-//     * get the center point of the pixel in the view plane
-//     * @param nX number of pixels in the width of the view plane
-//     * @param nY number of pixels in the height of the view plane
-//     * @param j index row in the view plane
-//     * @param i index column in the view plane
-//     * @return the center point of the pixel
-//     */
-//    private Point getCenterOfPixel(int nX, int nY, int j, int i){
-//        // calculate the ratio of the pixel by the height and by the width of the view plane
-//        // the ratio Ry = h/Ny, the height of the pixel
-//        double rY = alignZero(height / nY);
-//        // the ratio Rx = w/Nx, the width of the pixel
-//        double rX = alignZero(width / nX);
-//
-//        // Xj = (j - (Nx -1)/2) * Rx
-//        double xJ = alignZero((j - ((nX - 1d) / 2d)) * rX);
-//        // Yi = -(i - (Ny - 1)/2) * Ry
-//        double yI = alignZero(- (i - ((nY - 1d) / 2d)) * rY);
-//
-//        Point pIJ = p0;
-//
-//        if (xJ != 0d) {
-//            pIJ = pIJ.add(vRight.scale(xJ));
-//        }
-//        if (yI != 0d) {
-//            pIJ = pIJ.add(vUp.scale(yI));
-//        }
-//        return pIJ;
-//    }
 
 
 
@@ -191,16 +160,29 @@ public class Camera {
             //rendering the image
             int nX = _imageWriter.getNx();
             int nY = _imageWriter.getNy();
-            for (int i = 0; i < nY; i++) {
-                for (int j = 0; j < nX; j++) {
-                    List<Ray>  rays = constructGridRaysThroughPixel(nX,nY,j,i);
-                    Ray middleRay = constructRay(nX,nY,j,i);
-               //     Ray ray = constructRay(nX, nY, j, i);
-                //    Color pixelColor = _rayTracer.traceRay(ray);
-                    Color pixelColor = _rayTracer.averageColor(rays,middleRay);
-                    _imageWriter.writePixel(j, i, pixelColor);
+            if(antiAliasing) // if the antiAliasing imprvoment was added than
+            {
+                for (int i = 0; i < nY; i++) {
+                    for (int j = 0; j < nX; j++) {
+                        List<Ray> rays = constructGridRaysThroughPixel(nX, nY, j, i);
+                        Ray middleRay = constructRay(nX, nY, j, i);
+                        Color pixelColor = _rayTracer.averageColor(rays, middleRay);
+                        _imageWriter.writePixel(j, i, pixelColor);
+                    }
                 }
             }
+            else
+            {
+                for (int i = 0; i < nY; i++) {
+                    for (int j = 0; j < nX; j++)
+                    {
+                        Ray ray = constructRay(nX, nY, j, i);
+                        Color pixelColor = _rayTracer.traceRay(ray,numRays);
+                        _imageWriter.writePixel(j, i, pixelColor);
+                    }
+                }
+            }
+
         } catch (MissingResourceException e) {
             throw new UnsupportedOperationException("Not implemented yet" + e.getClassName());
         }
@@ -216,6 +198,26 @@ public class Camera {
         _rayTracer.setBeamRadius(radiusBeam);
         return this;
     }
+
+    /**
+     *
+     * @return wheter or not antialiasing will be performed
+     */
+    public boolean isAntiAliasing() {
+        return antiAliasing;
+    }
+
+    /**
+     * sets users choice whether to add antialiasing
+     * @param antiAliasing
+     * @return the camera
+     */
+    public Camera setAntiAliasing(boolean antiAliasing) {
+        this.antiAliasing = antiAliasing;
+        return this;
+    }
+
+
 
     /**
      * paints the image as a grid according to the wanted interval and color of grid lines
@@ -241,6 +243,7 @@ public class Camera {
     }
 
     public Camera setNumRays(int numRays) {
+
         this.numRays = numRays;
         return this;
     }
@@ -256,36 +259,36 @@ public class Camera {
     }
 
 
-    /**
-     *
-     * @param nX
-     * @param nY
-     * @param j
-     * @param i
-     * @return
-     */
-    private Point getPij(int nX, int nY, int j, int i) {
-
-        // calculates  the intersection point of the to vector to the screen after it was scaled by the distance
-        Point Pc = p0.add(vTo.scale(distance));
-
-        double Ry = height / nY; // how high a pixel is
-        double Rx = width / nX; // how wide a pixel is
-
-        double yi = ((i - nY / 2d) * Ry + Ry / 2d); // y coordinate
-        double xj = ((j - nX / 2d) * Rx + Rx / 2d); // x coordinate
-
-        Point Pij = Pc;
-
-        if (!isZero(xj)) {
-            Pij = Pij.add(vRight.scale(xj));
-        }
-        if (!isZero(yi)) {
-            Pij = Pij.subtract(vUp.scale(yi)); // Pij.add(_vUp.scale(-yi))
-        }
-        return Pij;
-    }
-
+//    /**
+//     *
+//     * @param nX
+//     * @param nY
+//     * @param j
+//     * @param i
+//     * @return
+//     */
+//    private Point getPij(int nX, int nY, int j, int i) {
+//
+//        // calculates  the intersection point of the to vector to the screen after it was scaled by the distance
+//        Point Pc = p0.add(vTo.scale(distance));
+//
+//        double Ry = height / nY; // how high a pixel is
+//        double Rx = width / nX; // how wide a pixel is
+//
+//        double yi = ((i - nY / 2d) * Ry + Ry / 2d); // y coordinate
+//        double xj = ((j - nX / 2d) * Rx + Rx / 2d); // x coordinate
+//
+//        Point Pij = Pc;
+//
+//        if (!isZero(xj)) {
+//            Pij = Pij.add(vRight.scale(xj));
+//        }
+//        if (!isZero(yi)) {
+//            Pij = Pij.subtract(vUp.scale(yi)); // Pij.add(_vUp.scale(-yi))
+//        }
+//        return Pij;
+//    }
+//
 
     /**
      *
@@ -298,35 +301,80 @@ public class Camera {
      */
     public List<Ray> constructGridRaysThroughPixel(int nX, int nY, int j, int i) {
 
-        double Rx = width / nX;//the length of pixel in X axis
-        double Ry = height / nY;//the length of pixel in Y axis
 
-        Point Pij = getPij(nX, nY, j, i);
-        Point tmp;
-        //-----SuperSampling-----
-        List<Ray> rays = new LinkedList<>();//the return list, construct Rays Through Pixels
+        //Image center
+        Point Pc = p0.add(vTo.scale(distance));
 
+        //Ratio (pixel width & height)
+        double Ry =height/ nX;
+        double Rx = width/nY;
 
-        double n = Math.floor(Math.sqrt(numRays));
-        int delta = (int) (n / 2d);
+        //delta values for going to Pixel[i,j] from Pc
+        double gapY =  -(i - (nY -1)/2)* Ry;
+        double gapX =  (j - (nX -1)/2)* Rx;
 
-        double gapX = Rx / n;
-        double gapY = Ry / n;
+        if (! isZero(gapX) )
+        {
+            Pc = Pc.add(vRight.scale(gapX));
+        }
 
+        if (! isZero(gapY))
+        {
+            Pc = Pc.add(vUp.scale(gapY));
+        }
+        List<Ray> rays=new ArrayList<>();
 
-        for (int row = -delta; row <= delta; row++) {
-            for (int col = -delta; col <= delta; col++) {
-                tmp = new Point(Pij);
-                if (!isZero(row)) {
-                    tmp = tmp.add(vRight.scale(row * gapX));
-                }
-                if (!isZero(col)) {
-                    tmp = tmp.add(vRight.scale(col * gapY));
-                }
-                rays.add(new Ray(p0, tmp.subtract(p0).normalize()));
+        /**
+         * puts the pixel center in the first place on the list.
+         */
+        rays.add(new Ray(p0,Pc.subtract(p0)));
+
+        /**
+         * creating Ry*Rx rays for each pixel.
+         */
+        Point newPoint=new Point(Pc.getX()-Rx/2,Pc.getY()+Rx/2,Pc.getZ());
+        for (double t = newPoint.getY(); t >newPoint.getY()-Ry; t-=0.01)
+        {
+            for (double k = newPoint.getX(); k < newPoint.getX()+Rx; k+=0.01)
+            {
+                rays.add(new Ray(p0,new Point(k,t,Pc.getZ()).subtract(p0)));
             }
         }
+
         return rays;
+
+
+
+
+//        double Rx = width / nX;//the length of pixel in X axis
+//        double Ry = height / nY;//the length of pixel in Y axis
+//
+//        Point Pij = getPij(nX, nY, j, i);
+//        Point tmp;
+//        //-----SuperSampling-----
+//        List<Ray> rays = new LinkedList<>();//the return list, construct Rays Through Pixels
+//
+//
+//        double n = Math.floor(Math.sqrt(numRays));
+//        int delta = (int) (n / 2d);
+//
+//        double gapX = Rx / n;
+//        double gapY = Ry / n;
+//
+//
+//        for (int row = -delta; row <= delta; row++) {
+//            for (int col = -delta; col <= delta; col++) {
+//                tmp = new Point(Pij);
+//                if (!isZero(row)) {
+//                    tmp = tmp.add(vRight.scale(row * gapX));
+//                }
+//                if (!isZero(col)) {
+//                    tmp = tmp.add(vRight.scale(col * gapY));
+//                }
+//                rays.add(new Ray(p0, tmp.subtract(p0).normalize()));
+//            }
+//        }
+//        return rays;
     }
 
 

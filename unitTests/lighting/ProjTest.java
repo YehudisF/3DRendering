@@ -167,7 +167,9 @@ public class ProjTest {
 
         Camera camera = new Camera(new Point(0, 150, 600), new Vector(0, -0.1, -0.5), new Vector(0, 0.5, -0.1)) //
                 .setVPSize(150, 150).setVPDistance(1000)
-                .move(new Double3(80d,0d,0d)).rotate(0,7,0d).setNumRays(1);
+                .move(new Double3(80d,0d,0d)).rotate(0,7,0d)
+                .setAntiAliasing(true)
+                ;
         Scene scene= new Scene.SceneBuilder("Test Scene").setBackground(new Color(BLACK)).build();
 //        scene.getLights().add( //
 //                new SpotLight(new Color(PINK), new Point(-50, -50, 200), new Vector(1, 1, -3)) //
@@ -292,7 +294,7 @@ public class ProjTest {
 
     ImageWriter imageWriter = new ImageWriter("myPicture3again", 600, 600); //myPicture3
         camera.setImageWriter(imageWriter) //
-            .setRayTracer(new RayTracerBasic(scene)) //
+            .setRayTracer(new RayTracerBasic(scene)).setSoftShadow(true)//
             .renderImage() //
                 .writeToImage();
 }
@@ -303,7 +305,8 @@ public class ProjTest {
     public void projTest3() {
         Camera camera = new Camera(new Point(0, 150, 600), new Vector(0, -0.1, -0.5), new Vector(0, 0.5, -0.1)) //
                 .setVPSize(150, 150).setVPDistance(1000)
-                .move(new Double3(80d,0d,0d)).rotate(0,7,0d).setNumRays(1000);
+                .move(new Double3(80d,0d,0d)).rotate(0,7,0d)
+                .setAntiAliasing(true);
         Scene scene= new Scene.SceneBuilder("Test Scene").setBackground(new Color(BLACK)).build();
 
         Material trMaterial = new Material().setKd(0.5).setKs(0.5).setKr(1d).setnShininess(300);
