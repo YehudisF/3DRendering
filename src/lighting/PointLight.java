@@ -47,11 +47,6 @@ public class PointLight extends Light implements LightSource {
         return super.getIntensity();
     }
 
-//    protected Double3 intensityHelp(Point p) {
-//        double ds = p.distanceSquared(position);
-//        double d = p.distance(position);
-//        return (kC.add(kL.scale(d)).add( kQ.scale(ds)));
-//    }
 
     public Color getIntensity(Point p) {
         // but kL and Kq are 0
@@ -95,12 +90,9 @@ public class PointLight extends Light implements LightSource {
         if (isZero(distance)) {
             throw new IllegalArgumentException("distance cannot be 0");
         }
-        //Thanks to Raphael Knoll
         Point lightHead = new Point(v.getX(),v.getY(),v.getZ());
         Vector normX;
 
-        // if v._head == (0,0,w) then normX.head ==(-w,0,0)
-        // otherwise normX.head == (-y,x,0)
         if (isZero(lightHead.getX()) && isZero(lightHead.getY())) {
             normX = new Vector(lightHead.getZ() * -1, 0, 0).normalize();
         } else {

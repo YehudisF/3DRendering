@@ -23,7 +23,7 @@ public abstract class RayTracer {
      * @param ray ray that intersect the scene
      * @return Color
      */
-    public abstract Color traceRay(Ray ray,int rayCounter);
+    public abstract Color traceRay(Ray ray);
 
     public abstract Color averageColor(List<Ray> rays,Ray middleRay);
 

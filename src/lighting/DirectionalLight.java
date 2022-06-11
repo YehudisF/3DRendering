@@ -35,6 +35,13 @@ public class DirectionalLight extends Light implements LightSource{
         return direction;
     }
 
+    /**
+     * 
+     * @param dummyPoint3D
+     * @param dummyRadius
+     * @param dummyInt
+     * @return
+     */
     @Override
     public List<Vector> getBeamL(Point dummyPoint3D, double dummyRadius, int dummyInt) {
         return List.of(new Vector(new Double3(direction.getX(),direction.getY(),direction.getZ())));
