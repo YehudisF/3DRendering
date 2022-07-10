@@ -33,6 +33,21 @@ public class Camera {
     private int numRays = 16
             ; // number of rays per pixel for supersampling
 
+    /**
+     * Turns multithreading on/off
+     */
+    private boolean isMultithreading = false;
+    /**
+     * How many threads to use
+     */
+    private int numOfThreads = 1;
+
+    /**
+     * Turns adaptive super-sampling on/off
+     */
+    private boolean isAdaptive = false;
+
+
     private ImageWriter _imageWriter;
     private RayTracer _rayTracer;
 
@@ -308,9 +323,9 @@ public class Camera {
          * creating Ry*Rx rays for each pixel.
          */
         Point newPoint=new Point(Pc.getX()-Rx/2,Pc.getY()+Rx/2,Pc.getZ());
-        for (double t = newPoint.getY(); t >newPoint.getY()-Ry; t-=0.03)
+        for (double t = newPoint.getY(); t >newPoint.getY()-Ry; t-=0.08)
         {
-            for (double k = newPoint.getX(); k < newPoint.getX()+Rx; k+=0.03 )
+            for (double k = newPoint.getX(); k < newPoint.getX()+Rx; k+=0.08 )
             {
                 rays.add(new Ray(p0,new Point(k,t,Pc.getZ()).subtract(p0)));
             }
@@ -321,7 +336,35 @@ public class Camera {
     }
 
 
+    /**
+     * Setter of builder patters
+     * sets the multithreading
+     * If set to 1, the render won't use the thread pool.
+     * If set to 0, the thread pool will pick the number of threads.
+     *
+     * @param threads number of threads to use
+     * @return the current render
+     * @throws IllegalArgumentException when threads is less than 0
+     */
+    public Camera setMultithreading(int threads) {
+        if (threads < 0)//threads cannot be less than zero
+            throw new IllegalArgumentException("Multithreading parameter must be 0 or higher");
 
+        isMultithreading = true;
+
+        if (threads != 0)//any number that is not zero is acceptable
+            numOfThreads = threads;
+
+        else {//if number received was zero:
+            int cores = Runtime.getRuntime().availableProcessors() - 2; //leave 2 spare threads
+            numOfThreads = cores <= 2 ? 1 : cores;//if cores is smaller than 2 than threads is 1, i=otherwise it is equal to cores
+        }
+        return this;
+    }
+
+
+
+    //moving and rotating camera bonus
     /**
      * Adds the given amount to the camera's position
      *
