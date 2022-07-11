@@ -14,6 +14,13 @@ public class Cube extends Intersectable{
     double halfHeight;
     Geometries squares;
 
+    /**
+     * constructor for the cube
+     * @param middle
+     * @param halfLength
+     * @param halfWidth
+     * @param halfHeight
+     */
     public Cube(Point middle, double halfLength,double halfWidth, double halfHeight) {
         this.middle = middle;
         this.halfLength = halfLength;

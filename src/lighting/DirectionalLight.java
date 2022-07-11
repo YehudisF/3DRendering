@@ -19,7 +19,7 @@ public class DirectionalLight extends Light implements LightSource{
      * @param intensity
      * @param direction
      */
-    protected DirectionalLight(Color intensity, Vector direction) {
+    public DirectionalLight(Color intensity, Vector direction) {
         super(intensity);
         this.direction = direction.normalize();
     }
@@ -36,7 +36,7 @@ public class DirectionalLight extends Light implements LightSource{
     }
 
     /**
-     * 
+     * gets the vectors of the light bam
      * @param dummyPoint3D
      * @param dummyRadius
      * @param dummyInt
@@ -47,6 +47,11 @@ public class DirectionalLight extends Light implements LightSource{
         return List.of(new Vector(new Double3(direction.getX(),direction.getY(),direction.getZ())));
     }
 
+    /**
+     * distance between light source and object
+     * @param p
+     * @return
+     */
     @Override
     public double getDistance(Point p) {
         return Double.POSITIVE_INFINITY;

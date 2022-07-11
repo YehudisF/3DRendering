@@ -201,73 +201,8 @@ public class ProjTest {
                 scene.getGeometries().add( new Polygon(new Point(i+0.0, 0.0, j+0.0), new Point(i + 50, 0.0,j+0.0 ), new Point(i + 50,0.0 ,j + 50 ), new Point(i+0.0, 0.0, j + 50)).setEmission(c).setMaterial(materialf)
                 );
             }
-//        // the wall on the side
-//        for (int i=0;i<60;i+=10)
-//            for(int j=-150;j<90;j+=10)
-//            {
-//                if(((i/10)%2==0 &&(j/10)%2==0)(Math.abs((i/10)%2)==1&& Math.abs((j/10)%2)==1))
-//                    c=new Color(WHITE);
-//                else
-//                    c=new Color(GRAY);
 //
-//                scene.getGeometries().add( new Polygon(new Point(-50, i+0.0, j+0.0), new Point(-50, i+0.0,j+10 ), new Point(-50,i+10 ,j + 10 ), new Point(-50, i+10, j + 0.0)).setEmission(c)
-//                );
-//            }
-//        // the back wall
-//        for (int i=-50;i<80;i+=10)
-//            for(int j=0;j<60;j+=10)
-//            {
-//                if(((i/10)%2==0 &&(j/10)%2==0)(Math.abs((i/10)%2)==1&& Math.abs((j/10)%2)==1))
-//                    c=new Color(WHITE);
-//                else
-//                    c=new Color(GRAY);
-//
-//                scene.getGeometries().add( new Polygon(new Point(i+0.0, j+0.0, -150), new Point(i+10, j+0.0,-150 ), new Point(i+10,j+10 ,-150 ), new Point(i+0.0, j+10, -150)).setEmission(c)
-//                );
-//            }
-
-
-
-
-
-
-
-
-
-//        for (int i=-30;i<50;i+=30)
-//            for(int j=-150;j<90;j+=30)
-//            {
-//                if(((i/10)%2==0 &&(j/10)%2==0)(Math.abs((i/10)%2)==1&& Math.abs((j/10)%2)==1))
-//                    c=new Color(WHITE);
-//                else
-//                    c=new Color(BLACK);
-//
-//                scene.getGeometries().add( new Polygon(new Point(i+0.0, 0.0, j+0.0), new Point(i + 30, 0.0,j+0.0 ), new Point(i + 30,0.0 ,j + 30 ), new Point(i+0.0, 0.0, j + 30)).setEmission(c)
-//                );
-//            }
     scene.getGeometries().add(
-//                new Cylinder(new Ray(new Point(0,0,0),new Vector(0,1,0)),5,-0d)
-//                        .setEmission(new Color(BLUE))
-//                        .setMaterial(new Material().setnShininess(30).setKd(0.5).setKs(0.5)),
-//                new Polygon(new Point(-20,20,0),new Point(20,20,0)
-//                        ,new Point(20,60,0),new Point(-20,60,0))
-//                        .setEmission(new Color(WHITE)).setMaterial(trMaterial),
-            //.setMaterial(new Material().setnShininess(30).setKd(0.5).setKs(0.5)),
-            //  new Plane(new Point(1,0,1),new Vector(0,1,0)).setEmission(new Color(MAGENTA)).setMaterial(trMaterial),
-            //new Sphere(new Point(-0,0,0),5).setEmission(new Color(MAGENTA)).setMaterial(trMaterial),
-            //  new Plane(new Point(-100000,0,-100000),new Point(100000,0,-100000),new Point(100000,0,100000)).setMaterial(material),
-            //       new Triangle(new Point(-50,0,-50),new Point(50,0,-50),new Point(50,0,50)).setMaterial(material),
-            //     new Triangle(new Point(-50,0,-50),new Point(50,0,50),new Point(-50,0,50)).setMaterial(material),
-            //  new Polygon(new Point(-50,0,-50),new Point(50,0,-50),new Point(50,0,50),new Point(-50,0,50)).setMaterial(material),
-            //            new Polygon(new Point(-100,50,-101),new Point(100,50,-101),new Point(100,-50,-101),new Point(-100,-50,-101)).setEmission(new Color(WHITE)).setMaterial(trMaterial),
-//                new Sphere (new Point(0,20,50),5).setEmission(new Color(BLUE)).setMaterial(trMaterial),
-//                new Sphere (new Point(0,-30,50),5).setEmission(new Color(MAGENTA)).setMaterial(trMaterial),
-//                new Sphere (new Point(0,-10,50),5).setEmission(new Color(BLUE)).setMaterial(trMaterial),
-//                new Sphere (new Point(0,10,50),5).setEmission(new Color(MAGENTA)).setMaterial(trMaterial),
-//                new Sphere (new Point(0,30,50),5).setEmission(new Color(BLUE)).setMaterial(trMaterial),
-//                new Sphere (new Point(0,50,50),5).setEmission(new Color(MAGENTA)).setMaterial(trMaterial),
-//                new Sphere (new Point(0,70,50),5).setEmission(new Color(BLUE)).setMaterial(trMaterial)
-            //  new Tube(new Ray(new Point(0,0,0),new Vector(0,1,0)),20).setEmission(new Color(BLACK)).setMaterial(new Material().setKd(0.5).setKs(0.5).setKt(0.0).setKr(0.1).setnShininess(30))
 
             //  new Sphere (new Point(0,50,0),8).setEmission(new Color(MAGENTA)).setMaterial(trMaterial),
                 new Cylinder (new Ray( new Point(25,40,25),new Vector(0,-1,0)),4,40).setEmission(new Color(ORANGE)).setMaterial(trMaterial),
@@ -285,16 +220,10 @@ public class ProjTest {
     //new Polygon(new Point(-5,-70,0),new Point(5,-70,0),new Point(5,20,0),new Point(-5,20,0)).setEmission(new Color(WHITE))
         );
 
-//        scene.getLights().add(new SpotLight(new Color(700, 400, 400), new Point(0, 70, 100), new Vector(0, 1, -1)) //
-//                .setkL(4E-5).setkQ(2E-7));
-//        scene.getLights().add( //
-//                new SpotLight(new Color(700, 400, 400), new Point(0, 10,0 ), new Vector(0, -1, 0)) //
-//                        .setkL(4E-4).setkQ(2E-5));
-//
 
-    ImageWriter imageWriter = new ImageWriter("myPicture3again", 600, 600); //myPicture3
+    ImageWriter imageWriter = new ImageWriter("myPicture2THreadagain", 600, 600); //myPicture3
         camera.setImageWriter(imageWriter) //
-            .setRayTracer(new RayTracerBasic(scene)).setSoftShadow(true)//
+            .setRayTracer(new RayTracerBasic(scene))//.setSoftShadow(true)//
             .renderImage() //
                 .writeToImage();
 }

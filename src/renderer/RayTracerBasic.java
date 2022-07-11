@@ -1,7 +1,5 @@
 package renderer;
 
-import geometries.FlatGeometry;
-import geometries.Geometries;
 import lighting.LightSource;
 import primitives.*;
 import scene.Scene;
@@ -29,11 +27,19 @@ public class RayTracerBasic extends RayTracer {
 
     private int beamRay = 16;
 
-
+    /**
+     * constructor
+     * @param scene
+     */
     public RayTracerBasic(Scene scene) {
         super(scene);
     }
 
+    /**
+     * sets the glossiness
+     * @param glossinessRays
+     * @return
+     */
     public RayTracerBasic setGlossinessRays(int glossinessRays) {
         if (glossinessRays <= 0) {
             throw new IllegalArgumentException("number of glossiness rays should be greater than 0");
@@ -43,6 +49,10 @@ public class RayTracerBasic extends RayTracer {
         return this;
     }
 
+    /**
+     *
+     * @returns the beam ray
+     */
     public int getBeamRay() {
         return beamRay;
     }
@@ -134,9 +144,9 @@ public class RayTracerBasic extends RayTracer {
     private Color calcGlobalEffects(GeoPoint geopoint, Ray inRay, int level, Double3 k) {
         Color color = Color.BLACK;
         Material material = geopoint.geometry.getMaterial();
-        Double3 kr = material.kR;
+        Double3 kr = material.kR; //how reflective the material is
         Double3 kkr = k.product(kr);
-        Vector v=inRay.getDir();
+        Vector v=inRay.getDir(); // gets the direction of the ray
         Vector n = geopoint.geometry.getNormal(geopoint.point);//
         if (!kkr.lowerThan(MIN_CALC_COLOR_K))
         {
@@ -150,7 +160,7 @@ public class RayTracerBasic extends RayTracer {
                 }
             }
         }
-        Double3 kt = material.kT;
+        Double3 kt = material.kT; // material transparency
         Double3 kkt = k.product(kt);
         if (!kkt.lowerThan(MIN_CALC_COLOR_K))
         {
@@ -243,6 +253,13 @@ public class RayTracerBasic extends RayTracer {
                 .toArray(Ray[]::new);
     }
 
+    /**
+     * creates  a single reflection ray
+     * @param n the normal to te surface hit
+     * @param pointGeo the point hit
+     * @param inRay the ray
+     * @return the reflected ray
+     */
     private Ray constructReflectedRay(Vector n, Point pointGeo, Ray inRay) {
 
         Vector v = inRay.getDir();
@@ -414,6 +431,43 @@ public class RayTracerBasic extends RayTracer {
                 return Double3.ZERO;
         }
         return ktr;
+
+    }
+
+    @Override
+    public Color AdaptiveSuperSamplingRec(Point centerP, double Width, double Height, double minWidth, double minHeight, Point cameraLoc, Vector Vright, Vector Vup, List<Point> prePoints) {
+        if (Width < minWidth * 2 || Height < minHeight * 2) {
+            return this.traceRay(new Ray(cameraLoc, centerP.subtract(cameraLoc))) ;
+        }
+
+        List<Point> nextCenterPList = new LinkedList<>();
+        List<Point> cornersList = new LinkedList<>();
+        List<primitives.Color> colorList = new LinkedList<>();
+        Point tempCorner;
+        Ray tempRay;
+        for (int i = -1; i <= 1; i += 2){
+            for (int j = -1; j <= 1; j += 2) {
+                tempCorner = centerP.add(Vright.scale(i * Width / 2)).add(Vup.scale(j * Height / 2));
+                cornersList.add(tempCorner);
+                if (prePoints == null || !prePoints.contains(tempCorner)) { //muad lepooranoottttt u changed itt!!!
+                    tempRay = new Ray(cameraLoc, tempCorner.subtract(cameraLoc));
+                    nextCenterPList.add(centerP.add(Vright.scale(i * Width / 4)).add(Vup.scale(j * Height / 4)));
+                    colorList.add(traceRay(tempRay));
+                }
+            }
+        }
+
+
+        if (nextCenterPList == null || nextCenterPList.size() == 0) {
+            return primitives.Color.BLACK;
+        }
+
+        Color tempColor = primitives.Color.BLACK;
+        for (Point center : nextCenterPList) {
+            tempColor = tempColor.add(AdaptiveSuperSamplingRec(center, Width/2,  Height/2,  minWidth,  minHeight ,  cameraLoc, Vright, Vup, cornersList));
+        }
+        return tempColor.reduce(nextCenterPList.size());
+
 
     }
 

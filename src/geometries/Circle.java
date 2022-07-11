@@ -14,6 +14,12 @@ public class Circle extends Geometry {
    final private Vector normal;
     protected Plane plane;
 
+    /**
+     * constructor for the circle
+     * @param centre
+     * @param radius
+     * @param normal
+     */
     public Circle(Point centre, double radius, Vector normal) {
         this.centre = centre;
         this.radius = radius;
@@ -21,6 +27,11 @@ public class Circle extends Geometry {
         plane = new Plane(centre,normal);
     }
 
+    /**
+     * gets the normal
+     * @param point {@link Point} external to the shape
+     * @return
+     */
     @Override
     public Vector getNormal(Point point) {
         return normal;

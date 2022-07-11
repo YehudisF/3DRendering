@@ -40,4 +40,6 @@ public abstract class RayTracer {
         this.beamRadius = beamRadius;
         return this;
     }
+
+    public abstract Color AdaptiveSuperSamplingRec(Point centerP, double Width, double Height, double minWidth, double minHeight, Point cameraLoc, Vector Vright, Vector Vup, List<Point> prePoints);
 }

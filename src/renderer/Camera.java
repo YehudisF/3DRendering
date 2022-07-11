@@ -3,6 +3,7 @@ package renderer;
 
 import primitives.*;
 import lighting.*;
+import scene.Scene;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -37,6 +38,22 @@ public class Camera {
      * Turns multithreading on/off
      */
     private boolean isMultithreading = false;
+
+    public Camera setMultithreading(boolean multithreading) {
+        isMultithreading = multithreading;
+        return this;
+    }
+
+    public Camera setNumOfThreads(int numOfThreads) {
+        this.numOfThreads = numOfThreads;
+        return this;
+    }
+
+    public Camera setAdaptive(boolean adaptive) {
+        isAdaptive = adaptive;
+        return this;
+    }
+
     /**
      * How many threads to use
      */
@@ -169,11 +186,34 @@ public class Camera {
             if (_rayTracer == null) {
                 throw new MissingResourceException("missing resource", RayTracer.class.getName(), "");
             }
+            Pixel.initialize(_imageWriter.getNy(),_imageWriter.getNx(),1);
+
+
 
             //rendering the image
             int nX = _imageWriter.getNx();
             int nY = _imageWriter.getNy();
-            if(antiAliasing) // if the antiAliasing imprvoment was added than
+
+            if(!isAdaptive){
+                while(numOfThreads-- > 0){
+                    new Thread(() -> {
+                        for(Pixel pixel = new Pixel(); pixel.nextPixel();pixel.pixelDone()) {
+                          Ray myRay=constructRay(nX,nY, pixel.col, pixel.row);
+                            _imageWriter.writePixel(pixel.col, pixel.row, antiAliasing ? _rayTracer.averageColor(constructGridRaysThroughPixel(nX, nY, pixel.col, pixel.row),myRay) : _rayTracer.traceRay(myRay));
+                        }}).start();
+                }
+                Pixel.waitToFinish();
+            }else{
+                while (numOfThreads-- >0){
+                    new Thread(() -> {
+                        for(Pixel pixel = new Pixel();pixel.nextPixel();pixel.pixelDone())
+                            _imageWriter.writePixel(pixel.col, pixel.row, AdaptiveSuperSampling(nX,nY, pixel.col, pixel.row, numRays));
+                    }).start();
+                }
+                Pixel.waitToFinish();
+            }
+
+            if(antiAliasing ) // if the antiAliasing imprvoment was added than
             {
                 for (int i = 0; i < nY; i++) {
                     for (int j = 0; j < nX; j++) {
@@ -201,6 +241,48 @@ public class Camera {
         }
         return this;
     }
+
+
+//    public Camera renderImage() {
+//        try {
+//            if (_imageWriter == null) {
+//                throw new MissingResourceException("missing resource", ImageWriter.class.getName(), "");
+//            }
+//            if (_rayTracer == null) {
+//                throw new MissingResourceException("missing resource", RayTracer.class.getName(), "");
+//            }
+//
+//            //rendering the image
+//            int nX = _imageWriter.getNx();
+//            int nY = _imageWriter.getNy();
+//            if(antiAliasing) // if the antiAliasing imprvoment was added than
+//            {
+//                for (int i = 0; i < nY; i++) {
+//                    for (int j = 0; j < nX; j++) {
+//                        List<Ray> rays = constructGridRaysThroughPixel(nX, nY, j, i);
+//                        Ray middleRay = constructRay(nX, nY, j, i);
+//                        Color pixelColor = _rayTracer.averageColor(rays, middleRay);
+//                        _imageWriter.writePixel(j, i, pixelColor);
+//                    }
+//                }
+//            }
+//            else // otherwise
+//            {
+//                for (int i = 0; i < nY; i++) {
+//                    for (int j = 0; j < nX; j++)
+//                    {
+//                        Ray ray = constructRay(nX, nY, j, i);
+//                        Color pixelColor = _rayTracer.traceRay(ray);
+//                        _imageWriter.writePixel(j, i, pixelColor);
+//                    }
+//                }
+//            }
+//
+//        } catch (MissingResourceException e) {
+//            throw new UnsupportedOperationException("Not implemented yet" + e.getClassName());
+//        }
+//        return this;
+//    }
 
     /**
      * choose to add soft shadow improvement
@@ -281,6 +363,33 @@ public class Camera {
     }
 
     /**
+     * helper function to calculate middle of pixel
+     * @param nX no of pixels on x axis
+     * @param nY no of pixels on y axis
+     * @param j wanted pixel xwise
+     * @param i wanted pixel yWise
+     * @return
+     */
+    private Point getCenterOfPixel(int nX, int nY, int j, int i) {
+        Point pC = p0.add(vTo.scale(distance));
+        Point pIJ = pC;
+
+        double rY = height / nY;
+        double rX = width / nX;
+
+        double yI = -(i - (nY - 1) / 2d) * rY;
+        double xJ = (j - (nX - 1) / 2d) * rX;
+
+        if (!isZero(xJ)) {
+            pIJ = pIJ.add(vRight.scale(xJ));
+        }
+        if (!isZero(yI)) {
+            pIJ = pIJ.add(vUp.scale(yI));
+        }
+        return pIJ;
+    }
+
+    /**
      *
      * @param nX number of pixels widthwith
      * @param nY number of pixels widthwith
@@ -323,9 +432,9 @@ public class Camera {
          * creating Ry*Rx rays for each pixel.
          */
         Point newPoint=new Point(Pc.getX()-Rx/2,Pc.getY()+Rx/2,Pc.getZ());
-        for (double t = newPoint.getY(); t >newPoint.getY()-Ry; t-=0.08)
+        for (double t = newPoint.getY(); t >newPoint.getY()-Ry; t-=0.1)
         {
-            for (double k = newPoint.getX(); k < newPoint.getX()+Rx; k+=0.08 )
+            for (double k = newPoint.getX(); k < newPoint.getX()+Rx; k+=0.1 )
             {
                 rays.add(new Ray(p0,new Point(k,t,Pc.getZ()).subtract(p0)));
             }
@@ -362,6 +471,34 @@ public class Camera {
         return this;
     }
 
+    /**
+     * detects pixels that contain triangle edges and shades these pixels at a higher rate than not-edge pixels.
+     * @param nX no of pixels on X axis
+     * @param nY no of pixels on Y axis
+     * @param j YWise plac of pixel
+     * @param i XWise pla
+     * @param numOfRays
+     * @return
+     */
+    private Color AdaptiveSuperSampling(int nX, int nY, int j, int i,  int numOfRays)  {
+        Vector Vright = vRight;
+        Vector Vup = vUp;
+        Point cameraLoc = this.p0;
+        int numOfRaysInRowCol = (int)Math.floor(Math.sqrt(numOfRays));
+        if(numOfRaysInRowCol == 1)  return _rayTracer.traceRay(constructRay(nX, nY, j, i));
+
+        Point pIJ = getCenterOfPixel(nX, nY, j, i);
+
+        double rY = alignZero(height / nY);
+        // the ratio Rx = w/Nx, the width of the pixel
+        double rX = alignZero(width / nX);
+
+
+        double PRy = rY/numOfRaysInRowCol;
+        double PRx = rX/numOfRaysInRowCol;
+        return _rayTracer.AdaptiveSuperSamplingRec(pIJ, rX, rY, PRx, PRy,cameraLoc,Vright, Vup,null);
+    }
+
 
 
     //moving and rotating camera bonus
@@ -391,6 +528,46 @@ public class Camera {
         return this;
     }
 
+    /**
+     * setter for point center of the camera
+     * @param x first coordinate of the point
+     * @param y second coordinate of the point
+     * @param z last coordinate of the point
+     */
+    public void setP0(double x, int y, double z) {
+        this.p0=new Point(x,y,z);
+    }
+
+
+    /**
+     *
+     * @param scene is the scene which you want to get rotation of
+     * @param camera2 is the camera in order to know its position at the beginning of the rotation
+     * @param frames how many frames you want to get
+     * @param angle what angle you want to rotate from (x/y/z)
+     * @param angleRadians is the angle in radians
+     * @param radius is the radius of the rotation
+     */
+    public static void Rotation(Scene scene, Camera camera2, int frames, double angle, double angleRadians, double radius) {
+        for (int i = 0; i < frames; i++) {
+            camera2.rotate(0, angle, 0);
+            camera2.setP0(
+                    Math.sin(angleRadians * (i + 1)) * radius,
+                    0,
+                    Math.cos(angleRadians * (i + 1)) * radius
+            );
+
+            ImageWriter imageWriter = new ImageWriter("PlayRoomRotate" + (i + 1), 1000, 1000);
+            camera2.setImageWriter(imageWriter)
+                    .setRayTracer(new RayTracerBasic(scene))
+                    .renderImage();
+            camera2.writeToImage();
+        }
+    }
+
+    public Point getp0() {
+        return p0;
+    }
 }
 
 

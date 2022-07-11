@@ -14,9 +14,9 @@ import static primitives.Util.isZero;
 public class PointLight extends Light implements LightSource {
 
     private final Point position;
-    private Double3 kC = Double3.ONE;
-    private Double3 kL = Double3.ZERO;
-    private Double3 kQ = Double3.ZERO;
+    private Double3 kC = Double3.ONE;// constant attenuateion factor
+    private Double3 kL = Double3.ZERO;// linear attenuation factor
+    private Double3 kQ = Double3.ZERO;// quadratc attenuation factor
 
     private static final Random RND = new Random();
 
@@ -47,29 +47,38 @@ public class PointLight extends Light implements LightSource {
         return super.getIntensity();
     }
 
-
+    /**
+     * 1/(kC+kLd+kQd^2)
+     * @param p
+     * @return
+     */
     public Color getIntensity(Point p) {
         // but kL and Kq are 0
         Color lightIntensity = getIntensity();
 
         double ds = p.distanceSquared(position);
-        double d = p.distance(position);
+        double d = p.distance(position);// it's the distance between the light and the surface being shaded
         Double3 denominator = kC.add(kL.scale(d)).add( kQ.scale(ds));
 
         return lightIntensity.reduce(denominator);
     }
 
+    /**
+     *
+     * @param p
+     * @return directional vector of the light
+     */
     @Override
     public Vector getL(Point p) {
         return p.subtract(position).normalize();
     }
 
     /**
-     * add description here!!!
+     *
      * @param p beginnig point
-     * @param radius
-     * @param amount
-     * @return
+     * @param radius beam radius
+     * @param amount chosen amount of rays in beam
+     * @return the vectors of the light beam
      */
     @Override
     public List<Vector> getBeamL(Point p, double radius, int amount) {
@@ -90,6 +99,7 @@ public class PointLight extends Light implements LightSource {
         if (isZero(distance)) {
             throw new IllegalArgumentException("distance cannot be 0");
         }
+        //starting point of the light
         Point lightHead = new Point(v.getX(),v.getY(),v.getZ());
         Vector normX;
 
@@ -116,7 +126,7 @@ public class PointLight extends Light implements LightSource {
             //d ranged between -radius and  +radius
             d = radius * (2 * RND.nextDouble() - 1);
             //d ranged between -radius and  +radius
-            if (isZero(d)) { //Thanks to Michael Shachor
+            if (isZero(d)) {
                 counter--;
                 continue;
             }
@@ -134,6 +144,11 @@ public class PointLight extends Light implements LightSource {
         return beam;
     }
 
+    /**
+     * gets the distance between the light and teh surface being shaded
+     * @param p
+     * @return
+     */
     @Override
     public double getDistance(Point p) {
         return position.distance(p);
