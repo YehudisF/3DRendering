@@ -432,9 +432,9 @@ public class Camera {
          * creating Ry*Rx rays for each pixel.
          */
         Point newPoint=new Point(Pc.getX()-Rx/2,Pc.getY()+Rx/2,Pc.getZ());
-        for (double t = newPoint.getY(); t >newPoint.getY()-Ry; t-=0.1)
+        for (double t = newPoint.getY(); t >newPoint.getY()-Ry; t-=0.05)
         {
-            for (double k = newPoint.getX(); k < newPoint.getX()+Rx; k+=0.1 )
+            for (double k = newPoint.getX(); k < newPoint.getX()+Rx; k+=0.05 )
             {
                 rays.add(new Ray(p0,new Point(k,t,Pc.getZ()).subtract(p0)));
             }
@@ -450,7 +450,7 @@ public class Camera {
      * sets the multithreading
      * If set to 1, the render won't use the thread pool.
      * If set to 0, the thread pool will pick the number of threads.
-     *
+     *With the help of Ariel Szermla and Dan Silberstein's code
      * @param threads number of threads to use
      * @return the current render
      * @throws IllegalArgumentException when threads is less than 0

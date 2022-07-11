@@ -309,7 +309,8 @@ public class RayTracerBasic extends RayTracer {
      *
      * @param n normal to the hemisphere's bottom
      * @return the randomized vectors
-     */
+     * Thanks to Tehilla Naki
+     **/
     private Vector[] createRandomVectorsOnSphere(Vector n, int numOfVectors) {
         // pick axis with smallest component in normal
         // in order to prevent picking an axis parallel
@@ -405,8 +406,8 @@ public class RayTracerBasic extends RayTracer {
      *
      * @param gp point tried
      * @param lightSource
-     * @param n
-     * @return
+     * @param n the normal to the lit shape
+     * @return the level of transparency in the point
      */
     private Double3 transparency(Vector l, Vector n, LightSource lightSource, GeoPoint gp) {
         Vector lightDirection = l.scale(-1); // from point to light source//
@@ -434,6 +435,19 @@ public class RayTracerBasic extends RayTracer {
 
     }
 
+    /**
+     * the recursive function to decide on points the level of supersampling
+     * @param centerP centre of area
+     * @param Width of area
+     * @param Height of area wanted
+     * @param minWidth
+     * @param minHeight
+     * @param cameraLoc currently
+     * @param Vright vectors from camera
+     * @param Vup vector from camera
+     * @param prePoints
+     * @return the color calculated
+     */
     @Override
     public Color AdaptiveSuperSamplingRec(Point centerP, double Width, double Height, double minWidth, double minHeight, Point cameraLoc, Vector Vright, Vector Vup, List<Point> prePoints) {
         if (Width < minWidth * 2 || Height < minHeight * 2) {
@@ -445,7 +459,7 @@ public class RayTracerBasic extends RayTracer {
         List<primitives.Color> colorList = new LinkedList<>();
         Point tempCorner;
         Ray tempRay;
-        for (int i = -1; i <= 1; i += 2){
+        for (int i = -1; i <= 1; i += 2){ // thanks to idan maman
             for (int j = -1; j <= 1; j += 2) {
                 tempCorner = centerP.add(Vright.scale(i * Width / 2)).add(Vup.scale(j * Height / 2));
                 cornersList.add(tempCorner);

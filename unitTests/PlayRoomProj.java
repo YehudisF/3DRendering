@@ -185,15 +185,12 @@ public class PlayRoomProj {
 
 
         ImageWriter imageWriter = new ImageWriter("playRoomAntialias", 600, 600);
+        camera.setAntiAliasing(true).setAdaptive(true).setNumOfThreads(3);
         camera.setImageWriter(imageWriter) //
                 .setRayTracer(new RayTracerBasic(scene)) //
                 .renderImage() //
                 .writeToImage();
 
-        S_sampling sample = new S_sampling(scene, imageWriter,true, false);
-        sample.setMultithreading(3); //set num of threads
-        sample.renderImage();
-        imageWriter.writeToImage();
     }
 
     @Test
@@ -289,6 +286,7 @@ public class PlayRoomProj {
 
 
         ImageWriter imageWriter = new ImageWriter("playRoomsoftShadow", 600, 600);
+        camera.setSoftShadow(true).setNumOfThreads(3).setNumRays(100).setAdaptive(true);
         camera.setImageWriter(imageWriter) //
                 .setRayTracer(new RayTracerBasic(scene).setSoftshadows(true)) //
                 .renderImage() //

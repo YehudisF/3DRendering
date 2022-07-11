@@ -31,6 +31,11 @@ public abstract class RayTracer {
         return softshadows;
     }
 
+    /**
+     * boolan funciton to decide if softshadows shoud be added
+     * @param softshadows
+     * @return
+     */
     public RayTracer setSoftshadows(boolean softshadows) {
         this.softshadows = softshadows;
         return this;
