@@ -115,7 +115,7 @@ public class RayTracerBasic extends RayTracer {
         }
         double rayRatio = rays.size()/10; // the number of rays
         color = color.add(traceRay(middleRay).scale(rayRatio));
-        return color.reduce(Double.valueOf(rays.size()) + rayRatio);
+        return color.reduce(rays.size() + rayRatio);
     }
 
     /**

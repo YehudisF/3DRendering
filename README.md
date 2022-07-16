@@ -1,3 +1,3 @@
-# ISE5782_6996_9033
-Targil 2 bonus:
-we added get normal + tests for (finite) cylinder
+# 3D rendering project
+rendering a scene
+by Avigayil and Yehudit![](C:\Users\Hudis\Downloads\ezgif.com-gif-maker.gif)

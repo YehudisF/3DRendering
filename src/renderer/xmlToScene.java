@@ -240,7 +240,10 @@ public class xmlToScene {
         for (int i = 0; i < geo.getChildNodes().getLength(); i++) {
             Node x = geo.getChildNodes().item(i);
             if (x.getNodeName() == "triangle") {
-                g.add(new Triangle(new Point(xmlAtDouble3("p0", x)), new Point(xmlAtDouble3("p1", x)), new Point(xmlAtDouble3("p2", x))));
+                g.add(new Triangle(
+                        new Point(xmlAtDouble3("p0", x)),
+                        new Point(xmlAtDouble3("p1", x)),
+                        new Point(xmlAtDouble3("p2", x))));
             }
             if (x.getNodeName() == "sphere") {
                 g.add(new Sphere(new Point(xmlAtDouble3("center", x)), Double.parseDouble(x.getAttributes().getNamedItem("radius").getTextContent())));
